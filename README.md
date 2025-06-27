@@ -58,6 +58,58 @@ This guide will help you set up the development environment for the veritas proj
    pip list
    ```
 
+### Code Linting with Black
+
+This project uses [Black](https://black.readthedocs.io/) for automatic code formatting to maintain consistent code style.
+
+#### Installing Black
+
+1. **Install Black** (if not already installed):
+   ```bash
+   pip install black
+   ```
+
+2. **Verify installation**:
+   ```bash
+   black --version
+   ```
+
+#### Using Black with VSCode Extension
+
+The easiest way to use Black is with the VSCode extension:
+
+1. **Install the Black Formatter extension** in VSCode:
+   - Open VSCode
+   - Go to Extensions (Ctrl+Shift+X or Cmd+Shift+X)
+   - Search for "Black Formatter"
+   - Install the extension by Microsoft
+
+2. **Configure VSCode to use Black**:
+   - Open VSCode settings (Ctrl+, or Cmd+,)
+   - Search for "python formatting provider"
+   - Set it to "black"
+   - Enable "Format on Save" for automatic formatting
+
+3. **Format your code**:
+   - Right-click in a Python file and select "Format Document"
+   - Or use the keyboard shortcut: Shift+Alt+F (Windows/Linux) or Shift+Option+F (Mac)
+   - Or enable "Format on Save" to automatically format when you save files
+
+#### Command Line Usage (Optional)
+
+If you prefer using Black from the command line:
+
+```bash
+# Format all Python files in the project
+black .
+
+# Format a specific file
+black base_model/base_model.py
+
+# Check what would be formatted without making changes
+black --check .
+```
+
 ### Running the Project
 
 1. **Make sure your virtual environment is activated**:
@@ -84,9 +136,11 @@ deactivate
 - **If you get permission errors**: Make sure you have write permissions in the project directory
 - **If packages fail to install**: Try upgrading pip first: `pip install --upgrade pip`
 - **If you need to recreate the environment**: Delete the `venv` folder and repeat the setup steps
+- **If Black formatting fails**: Make sure you're in the virtual environment and Black is installed
 
 ### Notes
 
 - Always activate the virtual environment before working on the project
 - The virtual environment keeps project dependencies isolated from your system Python
 - Remember to add `venv/` to your `.gitignore` file if it's not already there
+- Run `black .` before committing to ensure consistent code formatting
