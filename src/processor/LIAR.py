@@ -1,0 +1,68 @@
+"""
+Description: This script processes the LIAR dataset by reading multiple TSV files,
+concatenating them into a single DataFrame, shuffling the rows, and
+removing unnecessary columns.
+
+The final DataFrame is saved to a new CSV file.
+
+Author: Kenny Cui
+Date: July 6, 2025
+"""
+
+import pandas as pd
+import glob
+
+HEADER = [
+    "ID",
+    "verdict",
+    "statement",
+    "subject",
+    "speaker",
+    "speaker_job_title",
+    "state_info",
+    "party_affiliation",
+    "barely_true_counts",
+    "false_counts",
+    "half_true_counts",
+    "mostly_true_counts",
+    "pants_on_fire_counts",
+    "context"
+]
+
+_DATA_PATH = "../../data"
+_OUTPUT_PATH = "../dataset/output"
+
+dataset_files = glob.glob(f"{_DATA_PATH}/LIAR/*.tsv")
+dataset = []
+for file in dataset_files:
+    print(f"Processing {file}")
+    df = pd.read_csv(file, sep='\t', header=None, names=HEADER)
+    dataset.append(df)
+
+df = pd.concat(dataset, ignore_index=True)
+df = df.sample(frac=1).reset_index(drop=True)
+df.drop(columns=[
+    'ID',
+    'barely_true_counts',
+    'false_counts',
+    'half_true_counts',
+    'mostly_true_counts',
+    'pants_on_fire_counts',
+    'party_affiliation'],
+    inplace=True
+)
+
+remove_val = {
+    "barely-true",
+    "half-true",
+    "mostly-true",
+    "mostly-false"
+}
+
+df = df[~df['verdict'].isin(remove_val)] # Filter out "barely-true", "half-true", and "mostly-true"
+df.loc[df['verdict'] == "pants-fire", 'verdict'] = 'false' # Merge "pants-fire" into "false"
+df.loc[df['statement'].notnull(), 'statement'] = df['statement'].str.strip()
+df = df.sample(frac=1).reset_index(drop=True) # Shuffle the DataFrame
+
+df.to_csv(f"{_OUTPUT_PATH}/LIAR.csv", index=False)
+print("LIAR dataset processed and saved to LIAR.csv")
