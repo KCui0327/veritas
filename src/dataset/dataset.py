@@ -1,5 +1,5 @@
 """
-Description: A custom dataset class for the Veritas dataset, which is used in PyTorch for training machine learning models.
+Description: A custom dataset class for the Veritas dataset.
 
 Author: Kenny Cui
 Date: July 6, 2025
