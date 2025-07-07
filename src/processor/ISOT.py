@@ -28,8 +28,9 @@ for file in dataset_files:
 
 df = pd.concat(dataset, ignore_index=True)
 df = df.sample(frac=1).reset_index(drop=True) # Shuffle the DataFrame
-df = df.rename(columns={"title" : "statement", "text" : "content"})
-df.loc[df['statement'].notnull(), 'statement'] = df['statement'].str.strip()
+df.rename(columns={"title" : "statement", "text" : "content"}, inplace=True)
+df.loc[df['statement'].notnull(), 'statement'] = df['statement'].str.strip() # Strip useless characters
+df['verdict'] = df['verdict'].str.lower() # Normalize verdicts
 
 df.to_csv(f"{_OUTPUT_PATH}/ISOT.csv", index=False)
 print("ISOT dataset processed and saved to ISOT.csv")

@@ -37,8 +37,6 @@ df = df.sample(frac=1).reset_index(drop=True)  # Shuffle the DataFrame
 df['id'] = df['statement'].apply(lambda x: hashlib.md5(x.encode('utf-8')).hexdigest())
 df.drop_duplicates(subset=['id'], inplace=True, keep='first')
 
-df['verdict'] = df['verdict'].str.lower() # Normalize verdicts
-
 df.to_csv("veritas_dataset.csv", index=False, encoding='utf-8')
 
 # Create a VeritasDataset instance

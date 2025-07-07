@@ -59,10 +59,17 @@ remove_val = {
     "mostly-false"
 }
 
+# Remove unnecessary columns
+del df['speaker_job_title']
+del df['state_info']
+del df['speaker']
+
+df.rename(columns={"context": "content"}, inplace=True)
 df = df[~df['verdict'].isin(remove_val)] # Filter out "barely-true", "half-true", and "mostly-true"
 df.loc[df['verdict'] == "pants-fire", 'verdict'] = 'false' # Merge "pants-fire" into "false"
-df.loc[df['statement'].notnull(), 'statement'] = df['statement'].str.strip()
+df.loc[df['statement'].notnull(), 'statement'] = df['statement'].str.strip() # Strip useless characters
 df = df.sample(frac=1).reset_index(drop=True) # Shuffle the DataFrame
+df['verdict'] = df['verdict'].str.lower() # Normalize verdicts
 
 df.to_csv(f"{_OUTPUT_PATH}/LIAR.csv", index=False)
 print("LIAR dataset processed and saved to LIAR.csv")

@@ -61,9 +61,17 @@ with open(f"{_DATA_PATH}/Politifact/politifact_factcheck_data.json", 'r', encodi
 
 df = df.sample(frac=1).reset_index(drop=True) # Shuffle the DataFrame
 df.loc[df['statement'].notnull(), 'statement'] = df['statement'].str.strip()
+df.loc[df['verdict'] == "pants-fire", 'verdict'] = 'false' # Merge "pants-fire" into "false"
+df['verdict'] = df['verdict'].str.lower() # Normalize verdicts
 
-# Rename columns to match the expected format
-df = df.rename(columns={"statement_originator": "speaker"})
+# Removing unnecessary columns
+del df['factchecker']
+del df['factcheck_date']
+del df['factcheck_url']
+del df['statement_originator']
+del df['statement_url']
+
+df.rename(columns={"statement_date": "date"}, inplace=True)
 df.to_csv(f"{_OUTPUT_PATH}/politifact.csv", index=False, encoding='utf-8')
 print("Politifact dataset processed and saved to politifact.csv")
         
