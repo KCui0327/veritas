@@ -9,7 +9,7 @@ from torch.utils.data import Dataset
 import pandas as pd
 
 class VeritasDataset(Dataset):
-    def __init__(self, csv_file, statements=None, verdicts=None, transform=None):
+    def __init__(self, csv_file, statements=None, verdicts=None):
         # Allow for init. with either csv or statements and verdicts arrays
         if not statements and not verdicts:
             self.data_frame = pd.read_csv(csv_file)
@@ -19,8 +19,6 @@ class VeritasDataset(Dataset):
             self.data_frame = pd.DataFrame({'statement': statements, 'verdict': verdicts})
         else:
             raise ValueError("Both statements and verdicts must be provided or neither")
-
-        self.transform = transform
 
     def __len__(self):
         return len(self.data_frame)
@@ -44,7 +42,5 @@ class VeritasDataset(Dataset):
             raise IndexError("Index out of bounds for dataset")
 
         sample = self.data_frame.iloc[idx]
-        if self.transform:
-            sample = self.transform(sample)
 
         return sample['statement'], sample['verdict']
