@@ -10,6 +10,8 @@ Date: July 6, 2025
 
 import json
 import pandas as pd
+import os
+from pathlib import Path
 
 HEADER = [
     "statement",
@@ -25,8 +27,10 @@ HEADER = [
 df = pd.DataFrame(columns=HEADER)
 verdict_discard = {"mostly-false", "half-true", "mostly-true"}
 
-_DATA_PATH = "../../data"
-_OUTPUT_PATH = "../dataset/output"
+PROJECT_DIR = Path(__file__).resolve().parents[3]
+PROJECT_DIR = Path(__file__).resolve().parents[3]
+_DATA_PATH = os.path.join(PROJECT_DIR, 'data')
+_OUTPUT_PATH = os.path.join(Path(__file__).resolve().parents[1], 'output')
 
 with open(
     f"{_DATA_PATH}/Politifact/politifact_factcheck_data.json", "r", encoding="utf-8"
