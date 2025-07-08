@@ -10,9 +10,12 @@ Date: July 6, 2025
 
 import pandas as pd
 import glob
+import os
+from pathlib import Path
 
-_DATA_PATH = "../../data"
-_OUTPUT_PATH = "../dataset/output"
+PROJECT_DIR = Path(__file__).resolve().parents[3]
+_DATA_PATH = os.path.join(PROJECT_DIR, 'data')
+_OUTPUT_PATH = os.path.join(Path(__file__).resolve().parents[1], 'output')
 
 dataset_files = glob.glob(f"{_DATA_PATH}/FakeNewsNet/*.csv")
 dataset = []
