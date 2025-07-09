@@ -10,6 +10,8 @@ Date: July 6, 2025
 
 import json
 import pandas as pd
+import os
+from pathlib import Path
 
 HEADER = [
     "statement",
@@ -25,8 +27,9 @@ HEADER = [
 df = pd.DataFrame(columns=HEADER)
 verdict_discard = {"mostly-false", "half-true", "mostly-true"}
 
-_DATA_PATH = "../../data"
-_OUTPUT_PATH = "../dataset/output"
+PROJECT_DIR = Path(__file__).resolve().parents[3]
+_DATA_PATH = os.path.join(PROJECT_DIR, "data")
+_OUTPUT_PATH = os.path.join(Path(__file__).resolve().parents[1], "output")
 
 with open(
     f"{_DATA_PATH}/Politifact/politifact_factcheck_data.json", "r", encoding="utf-8"
@@ -61,7 +64,13 @@ with open(
 
         df.loc[len(df)] = [statement, verdict] + data
 
-df = df.sample(frac=1).reset_index(drop=True)  # Shuffle the DataFrame
+df = df.sample(frac=1, random_state=21).reset_index(drop=True)  # Shuffle the DataFrame
+df.loc[df["statement"].notnull(), "statement"] = df["statement"].str.strip()
+df.loc[df["verdict"] == "pants-fire", "verdict"] = (
+    "false"  # Merge "pants-fire" into "false"
+)
+df["verdict"] = df["verdict"].str.lower()  # Normalize verdicts
+df = df.sample(frac=1, random_state=21).reset_index(drop=True)  # Shuffle the DataFrame
 df.loc[df["statement"].notnull(), "statement"] = df["statement"].str.strip()
 df.loc[df["verdict"] == "pants-fire", "verdict"] = (
     "false"  # Merge "pants-fire" into "false"

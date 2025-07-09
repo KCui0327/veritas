@@ -11,6 +11,8 @@ Date: July 6, 2025
 
 import pandas as pd
 import glob
+import os
+from pathlib import Path
 
 HEADER = [
     "ID",
@@ -29,8 +31,9 @@ HEADER = [
     "context",
 ]
 
-_DATA_PATH = "../../data"
-_OUTPUT_PATH = "../dataset/output"
+PROJECT_DIR = Path(__file__).resolve().parents[3]
+_DATA_PATH = os.path.join(PROJECT_DIR, "data")
+_OUTPUT_PATH = os.path.join(Path(__file__).resolve().parents[1], "output")
 
 dataset_files = glob.glob(f"{_DATA_PATH}/LIAR/*.tsv")
 dataset = []
@@ -40,7 +43,7 @@ for file in dataset_files:
     dataset.append(df)
 
 df = pd.concat(dataset, ignore_index=True)
-df = df.sample(frac=1).reset_index(drop=True)
+df = df.sample(frac=1, random_state=21).reset_index(drop=True)
 df.drop(
     columns=[
         "ID",
@@ -71,7 +74,7 @@ df.loc[df["verdict"] == "pants-fire", "verdict"] = (
 df.loc[df["statement"].notnull(), "statement"] = df[
     "statement"
 ].str.strip()  # Strip useless characters
-df = df.sample(frac=1).reset_index(drop=True)  # Shuffle the DataFrame
+df = df.sample(frac=1, random_state=21).reset_index(drop=True)  # Shuffle the DataFrame
 df["verdict"] = df["verdict"].str.lower()  # Normalize verdicts
 
 df.to_csv(f"{_OUTPUT_PATH}/LIAR.csv", index=False)
