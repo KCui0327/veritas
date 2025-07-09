@@ -1,5 +1,13 @@
 # veritas
-APS360 Project
+APS360 Project - Fake News Detection System
+
+## Overview
+
+Veritas is a comprehensive fake news detection system that uses multiple machine learning approaches to classify news articles as real or fake. The project includes:
+
+- **Base Model**: Traditional machine learning approach using TF-IDF and Logistic Regression
+- **RNN Model**: Deep learning approach using Recurrent Neural Networks
+- **Dataset Processing**: Automated pipeline to process multiple fake news datasets
 
 ## Getting Started
 
@@ -110,19 +118,112 @@ black base_model/base_model.py
 black --check .
 ```
 
-### Running the Project
+## Running the Project
 
-1. **Make sure your virtual environment is activated**:
+The project contains three main components, each with its own main.py file:
+
+### 1. Dataset Processing (`src/dataset/main.py`)
+
+This script processes multiple fake news datasets and combines them into a unified Veritas dataset.
+
+**Usage:**
+```bash
+cd src/dataset
+python main.py
+```
+
+**What it does:**
+- Runs all processor scripts in the `../processor/` directory
+- Combines outputs from multiple datasets (FakeNewsNet, ISOT, LIAR, Politifact, WELFake)
+- Removes duplicate entries based on content hashing
+- Creates a unified `veritas_dataset.csv` file
+- Initializes a `VeritasDataset` instance for PyTorch training
+
+**Output:**
+- `veritas_dataset.csv`: Combined dataset with columns: `statement`, `verdict`, `id`
+
+### 2. Base Model (`src/base_model/main.py`)
+
+This script trains and tests a traditional machine learning model using TF-IDF features and Logistic Regression.
+
+**Usage:**
+```bash
+cd src/base_model
+python main.py
+```
+
+**What it does:**
+- Trains a Logistic Regression model on TF-IDF features
+- Performs model inference on test articles
+- Currently uses sample data (TODO: integrate with actual dataset)
+- Saves the trained model for later use
+
+**Features:**
+- TF-IDF vectorization with n-gram features
+- Cross-entropy loss for binary classification
+- Model persistence and loading
+- Real-time inference on new articles
+
+### 3. RNN Model (`src/rnn_model/main.py`)
+
+This script trains a deep learning model using Recurrent Neural Networks for sequence-based fake news detection.
+
+**Usage:**
+```bash
+cd src/rnn_model
+python main.py
+```
+
+**What it does:**
+- Initializes an RNN model for text classification
+- Configures training parameters (optimizer, loss function, etc.)
+- Trains the model using the custom trainer
+- Saves checkpoints and training history
+
+**Features:**
+- Custom RNN architecture for text processing
+- Configurable training parameters via `TrainingConfig`
+- Automatic checkpoint saving
+- Training history tracking
+- GPU support when available
+
+**Configuration:**
+The training can be customized by modifying the `TrainingConfig` in `main.py`:
+- Learning rate: 0.001
+- Epochs: 100
+- Batch size: 32
+- Optimizer: Adam
+- Loss function: CrossEntropyLoss
+- Save directory: "checkpoints"
+
+### Running All Components
+
+To run the complete pipeline:
+
+1. **Process the dataset first:**
    ```bash
-   source venv/bin/activate  # macOS/Linux
-   # or
-   venv\Scripts\activate     # Windows
+   cd src/dataset
+   python main.py
    ```
 
-2. **Run your project**:
+2. **Train the base model:**
    ```bash
-   python base_model/base_model.py
+   cd src/base_model
+   python main.py
    ```
+
+3. **Train the RNN model:**
+   ```bash
+   cd src/rnn_model
+   python main.py
+   ```
+
+### Make sure your virtual environment is activated before running any scripts:
+```bash
+source venv/bin/activate  # macOS/Linux
+# or
+venv\Scripts\activate     # Windows
+```
 
 ### Deactivating the Virtual Environment
 
