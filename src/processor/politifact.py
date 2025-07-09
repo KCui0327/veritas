@@ -19,21 +19,23 @@ HEADER = [
     "statement_url",
     "factchecker",
     "factcheck_date",
-    "factcheck_url"
+    "factcheck_url",
 ]
 
 df = pd.DataFrame(columns=HEADER)
-verdict_discard = {'mostly-false', 'half-true', 'mostly-true'}
+verdict_discard = {"mostly-false", "half-true", "mostly-true"}
 
 _DATA_PATH = "../../data"
 _OUTPUT_PATH = "../dataset/output"
 
-with open(f"{_DATA_PATH}/Politifact/politifact_factcheck_data.json", 'r', encoding='utf-8') as file:
+with open(
+    f"{_DATA_PATH}/Politifact/politifact_factcheck_data.json", "r", encoding="utf-8"
+) as file:
     for line in file:
         data_point = json.loads(line)
 
         verdict = data_point.get("verdict", "")
-        if verdict == "" or  verdict in verdict_discard:
+        if verdict == "" or verdict in verdict_discard:
             continue
         if verdict == "pants on fire":
             verdict = "false"
@@ -54,24 +56,25 @@ with open(f"{_DATA_PATH}/Politifact/politifact_factcheck_data.json", 'r', encodi
             statement_url,
             factchecker,
             factcheck_date,
-            factcheck_url
+            factcheck_url,
         ]
 
         df.loc[len(df)] = [statement, verdict] + data
 
-df = df.sample(frac=1).reset_index(drop=True) # Shuffle the DataFrame
-df.loc[df['statement'].notnull(), 'statement'] = df['statement'].str.strip()
-df.loc[df['verdict'] == "pants-fire", 'verdict'] = 'false' # Merge "pants-fire" into "false"
-df['verdict'] = df['verdict'].str.lower() # Normalize verdicts
+df = df.sample(frac=1).reset_index(drop=True)  # Shuffle the DataFrame
+df.loc[df["statement"].notnull(), "statement"] = df["statement"].str.strip()
+df.loc[df["verdict"] == "pants-fire", "verdict"] = (
+    "false"  # Merge "pants-fire" into "false"
+)
+df["verdict"] = df["verdict"].str.lower()  # Normalize verdicts
 
 # Removing unnecessary columns
-del df['factchecker']
-del df['factcheck_date']
-del df['factcheck_url']
-del df['statement_originator']
-del df['statement_url']
+del df["factchecker"]
+del df["factcheck_date"]
+del df["factcheck_url"]
+del df["statement_originator"]
+del df["statement_url"]
 
 df.rename(columns={"statement_date": "date"}, inplace=True)
-df.to_csv(f"{_OUTPUT_PATH}/politifact.csv", index=False, encoding='utf-8')
+df.to_csv(f"{_OUTPUT_PATH}/politifact.csv", index=False, encoding="utf-8")
 print("Politifact dataset processed and saved to politifact.csv")
-        
