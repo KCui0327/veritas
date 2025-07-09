@@ -8,6 +8,7 @@ Date: July 6, 2025
 from torch.utils.data import Dataset
 import pandas as pd
 
+
 class VeritasDataset(Dataset):
     def __init__(self, csv_file):
         self.data_frame = pd.read_csv(csv_file)
@@ -21,7 +22,9 @@ class VeritasDataset(Dataset):
             ret = []
 
             for _, sample in samples.iterrows():
-                ret.append({'statement': sample['statement'], 'verdict': sample['verdict']})
+                ret.append(
+                    {"statement": sample["statement"], "verdict": sample["verdict"]}
+                )
             return ret
 
         if not isinstance(idx, int):
@@ -32,6 +35,6 @@ class VeritasDataset(Dataset):
 
         sample = self.data_frame.iloc[idx]
 
-        sample = {'statement': sample['statement'], 'verdict': sample['verdict']}
+        sample = {"statement": sample["statement"], "verdict": sample["verdict"]}
 
         return sample

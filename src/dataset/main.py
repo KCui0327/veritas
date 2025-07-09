@@ -34,10 +34,10 @@ df = pd.concat(datasets, ignore_index=True)
 df = df.sample(frac=1).reset_index(drop=True)  # Shuffle the DataFrame
 
 # Remove duplicates based on the 'statement' column through unique hashing
-df['id'] = df['statement'].apply(lambda x: hashlib.md5(x.encode('utf-8')).hexdigest())
-df.drop_duplicates(subset=['id'], inplace=True, keep='first')
+df["id"] = df["statement"].apply(lambda x: hashlib.md5(x.encode("utf-8")).hexdigest())
+df.drop_duplicates(subset=["id"], inplace=True, keep="first")
 
-df.to_csv("veritas_dataset.csv", index=False, encoding='utf-8')
+df.to_csv("veritas_dataset.csv", index=False, encoding="utf-8")
 
 # Create a VeritasDataset instance
 dataset = VeritasDataset(_DATASET_NAME)

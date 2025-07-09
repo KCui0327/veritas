@@ -21,16 +21,18 @@ for file in dataset_files:
     print(f"Processing {file}")
     df = pd.read_csv(file, header=0)
     if "True" in file:
-        df['verdict'] = 'true'
+        df["verdict"] = "true"
     else:
-        df['verdict'] = 'false'
+        df["verdict"] = "false"
     dataset.append(df)
 
 df = pd.concat(dataset, ignore_index=True)
-df = df.sample(frac=1).reset_index(drop=True) # Shuffle the DataFrame
-df.rename(columns={"title" : "statement", "text" : "content"}, inplace=True)
-df.loc[df['statement'].notnull(), 'statement'] = df['statement'].str.strip() # Strip useless characters
-df['verdict'] = df['verdict'].str.lower() # Normalize verdicts
+df = df.sample(frac=1).reset_index(drop=True)  # Shuffle the DataFrame
+df.rename(columns={"title": "statement", "text": "content"}, inplace=True)
+df.loc[df["statement"].notnull(), "statement"] = df[
+    "statement"
+].str.strip()  # Strip useless characters
+df["verdict"] = df["verdict"].str.lower()  # Normalize verdicts
 
 df.to_csv(f"{_OUTPUT_PATH}/ISOT.csv", index=False)
 print("ISOT dataset processed and saved to ISOT.csv")
