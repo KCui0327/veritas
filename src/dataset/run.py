@@ -20,7 +20,8 @@ import os
 _DATASET_PATH = "./output"
 _DATASET_NAME = "veritas_dataset.csv"
 _PROCESSOR_PATH = "processor"
-_DATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+_DATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+
 
 def process_data():
     for file in os.listdir(_PROCESSOR_PATH):
@@ -37,13 +38,18 @@ def process_data():
 
     df = pd.concat(datasets, ignore_index=True)
     # random state is seed
-    df = df.sample(frac=1, random_state=21).reset_index(drop=True)  # Shuffle the DataFrame
+    df = df.sample(frac=1, random_state=21).reset_index(
+        drop=True
+    )  # Shuffle the DataFrame
 
     # Remove duplicates based on the 'statement' column through unique hashing
-    df['id'] = df['statement'].apply(lambda x: hashlib.md5(x.encode('utf-8')).hexdigest())
-    df.drop_duplicates(subset=['id'], inplace=True, keep='first')
+    df["id"] = df["statement"].apply(
+        lambda x: hashlib.md5(x.encode("utf-8")).hexdigest()
+    )
+    df.drop_duplicates(subset=["id"], inplace=True, keep="first")
 
-    df.to_csv("veritas_dataset.csv", index=False, encoding='utf-8')
+    df.to_csv("veritas_dataset.csv", index=False, encoding="utf-8")
+
 
 def split_dataset(validation_size=0.2, transform=None):
     # Create a VeritasDataset instance
@@ -60,17 +66,21 @@ def split_dataset(validation_size=0.2, transform=None):
         statements,
         verdicts,
         test_size=validation_size,
-        random_state=1, # Seed
-        stratify=verdicts # Enable Stratified split
+        random_state=1,  # Seed
+        stratify=verdicts,  # Enable Stratified split
     )
 
     return x_train, x_val, y_train, y_val
 
+
 def create_loader(x, y, batch_size=32, shuffle=False, num_workers=0):
     val_dataset = VeritasDataset(None, x, y)
-    data_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=shuffle, num_workers=num_workers)
+    data_loader = DataLoader(
+        val_dataset, batch_size=batch_size, shuffle=shuffle, num_workers=num_workers
+    )
 
     return data_loader
+
 
 def run():
     # Uncomment to reprocess all datasets
@@ -79,6 +89,7 @@ def run():
     train_dataloader = create_loader(x_train, y_train)
     val_dataloader = create_loader(x_val, y_val)
     return train_dataloader, val_dataloader
+
 
 if __name__ == "__main__":
     train_loader, val_loader = run()

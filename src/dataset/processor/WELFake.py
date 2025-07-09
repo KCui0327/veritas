@@ -12,8 +12,8 @@ import pandas as pd
 from pathlib import Path
 
 PROJECT_DIR = Path(__file__).resolve().parents[3]
-_DATA_PATH = os.path.join(PROJECT_DIR, 'data')
-_OUTPUT_PATH = os.path.join(Path(__file__).resolve().parents[1], 'output')
+_DATA_PATH = os.path.join(PROJECT_DIR, "data")
+_OUTPUT_PATH = os.path.join(Path(__file__).resolve().parents[1], "output")
 
 columns = ["title", "text", "label"]
 df = pd.read_csv(f"{_DATA_PATH}/WELFake/WELFake_Dataset.csv")

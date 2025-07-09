@@ -17,7 +17,9 @@ class VeritasDataset(Dataset):
         elif statements and verdicts:
             if len(statements) != len(verdicts):
                 raise ValueError("Statements and verdicts must have the same length")
-            self.data_frame = pd.DataFrame({'statement': statements, 'verdict': verdicts})
+            self.data_frame = pd.DataFrame(
+                {"statement": statements, "verdict": verdicts}
+            )
         else:
             raise ValueError("Both statements and verdicts must be provided or neither")
 
@@ -32,8 +34,8 @@ class VeritasDataset(Dataset):
             statements, verdicts = [], []
 
             for _, sample in samples.iterrows():
-                statements.append(sample['statement'])
-                verdicts.append(sample['verdict'])
+                statements.append(sample["statement"])
+                verdicts.append(sample["verdict"])
             return statements, verdicts
 
         if not isinstance(idx, int):
@@ -44,4 +46,4 @@ class VeritasDataset(Dataset):
 
         sample = self.data_frame.iloc[idx]
 
-        return sample['statement'], sample['verdict']
+        return sample["statement"], sample["verdict"]

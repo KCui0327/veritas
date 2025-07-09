@@ -32,8 +32,8 @@ HEADER = [
 ]
 
 PROJECT_DIR = Path(__file__).resolve().parents[3]
-_DATA_PATH = os.path.join(PROJECT_DIR, 'data')
-_OUTPUT_PATH = os.path.join(Path(__file__).resolve().parents[1], 'output')
+_DATA_PATH = os.path.join(PROJECT_DIR, "data")
+_OUTPUT_PATH = os.path.join(Path(__file__).resolve().parents[1], "output")
 
 dataset_files = glob.glob(f"{_DATA_PATH}/LIAR/*.tsv")
 dataset = []
