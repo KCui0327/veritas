@@ -30,7 +30,7 @@ for file in dataset_files:
     dataset.append(df)
 
 df = pd.concat(dataset, ignore_index=True)
-df = df.sample(frac=1).reset_index(drop=True)  # Shuffle the DataFrame
+df = df.sample(frac=1, random_state=21).reset_index(drop=True)  # Shuffle the DataFrame
 df.rename(
     columns={"title": "statement", "text": "content", "publish_date": "date"},
     inplace=True,
