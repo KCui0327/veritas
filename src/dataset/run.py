@@ -36,7 +36,8 @@ def process_data():
         datasets.append(df)
 
     df = pd.concat(datasets, ignore_index=True)
-    df = df.sample(frac=1).reset_index(drop=True)  # Shuffle the DataFrame
+    # random state is seed
+    df = df.sample(frac=1, random_state=21).reset_index(drop=True)  # Shuffle the DataFrame
 
     # Remove duplicates based on the 'statement' column through unique hashing
     df['id'] = df['statement'].apply(lambda x: hashlib.md5(x.encode('utf-8')).hexdigest())
@@ -44,9 +45,9 @@ def process_data():
 
     df.to_csv("veritas_dataset.csv", index=False, encoding='utf-8')
 
-def split_dataset():
+def split_dataset(validation_size=0.2, transform=None):
     # Create a VeritasDataset instance
-    dataset = VeritasDataset(_DATASET_NAME)
+    dataset = VeritasDataset(_DATASET_NAME, transform=transform)
 
     statements, verdicts = [], []
 
@@ -58,7 +59,7 @@ def split_dataset():
     x_train, x_val, y_train, y_val = train_test_split(
         statements,
         verdicts,
-        test_size=0.2,
+        test_size=validation_size,
         random_state=1, # Seed
         stratify=verdicts # Enable Stratified split
     )

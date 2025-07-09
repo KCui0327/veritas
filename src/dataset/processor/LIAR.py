@@ -43,7 +43,7 @@ for file in dataset_files:
     dataset.append(df)
 
 df = pd.concat(dataset, ignore_index=True)
-df = df.sample(frac=1).reset_index(drop=True)
+df = df.sample(frac=1, random_state=21).reset_index(drop=True)
 df.drop(
     columns=[
         "ID",
@@ -74,7 +74,7 @@ df.loc[df["verdict"] == "pants-fire", "verdict"] = (
 df.loc[df["statement"].notnull(), "statement"] = df[
     "statement"
 ].str.strip()  # Strip useless characters
-df = df.sample(frac=1).reset_index(drop=True)  # Shuffle the DataFrame
+df = df.sample(frac=1, random_state=21).reset_index(drop=True)  # Shuffle the DataFrame
 df["verdict"] = df["verdict"].str.lower()  # Normalize verdicts
 
 df.to_csv(f"{_OUTPUT_PATH}/LIAR.csv", index=False)
