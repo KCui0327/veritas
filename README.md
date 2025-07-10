@@ -15,10 +15,29 @@ This guide will help you set up the development environment for the veritas proj
 
 ### Prerequisites
 
-- Python 3.8 or higher
-- pip (Python package installer)
+- Python 3.10 or higher
+- Poetry (Python dependency management tool)
 
-### Setting up the Virtual Environment
+### Installing Poetry
+
+If you don't have Poetry installed, follow the official installation guide:
+
+**On macOS/Linux:**
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
+```
+
+**On Windows:**
+```powershell
+(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
+```
+
+**Verify installation:**
+```bash
+poetry --version
+```
+
+### Setting up the Project
 
 1. **Clone the repository** (if you haven't already):
    ```bash
@@ -26,45 +45,30 @@ This guide will help you set up the development environment for the veritas proj
    cd veritas
    ```
 
-2. **Create a virtual environment**:
+2. **Install dependencies using Poetry:**
    ```bash
-   python -m venv venv
+   poetry install
    ```
 
-3. **Activate the virtual environment**:
-
-   **On macOS/Linux**:
+3. **Activate the Poetry virtual environment:**
    ```bash
-   source venv/bin/activate
+   poetry shell
    ```
 
-   **On Windows**:
+4. **Verify the environment is active:**
    ```bash
-   venv\Scripts\activate
+   which python  # Should point to Poetry's virtual environment
+   pip list      # Should show all project dependencies
    ```
 
-4. **Verify the virtual environment is active**:
-   ```bash
-   which python  # Should point to your venv directory
-   pip list      # Should show only basic packages
-   ```
+### Project Dependencies
 
-### Installing Dependencies
-
-1. **Install required packages** (if you have a requirements.txt file):
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. **Or install packages individually** (if no requirements.txt exists):
-   ```bash
-   pip install <package-name>
-   ```
-
-3. **Verify installation**:
-   ```bash
-   pip list
-   ```
+The project uses the following main dependencies (defined in `pyproject.toml`):
+- **torch**: PyTorch for deep learning models
+- **pandas**: Data manipulation and analysis
+- **scikit-learn**: Machine learning algorithms
+- **matplotlib**: Plotting and visualization
+- **seaborn**: Statistical data visualization
 
 ### Code Linting with Black
 
@@ -74,12 +78,12 @@ This project uses [Black](https://black.readthedocs.io/) for automatic code form
 
 1. **Install Black** (if not already installed):
    ```bash
-   pip install black
+   poetry add --group dev black
    ```
 
-2. **Verify installation**:
+2. **Verify installation:**
    ```bash
-   black --version
+   poetry run black --version
    ```
 
 #### Using Black with VSCode Extension
@@ -109,31 +113,30 @@ If you prefer using Black from the command line:
 
 ```bash
 # Format all Python files in the project
-black .
+poetry run black .
 
 # Format a specific file
-black base_model/base_model.py
+poetry run black src/base_model/main.py
 
 # Check what would be formatted without making changes
-black --check .
+poetry run black --check .
 ```
 
 ## Running the Project
 
 The project contains three main components, each with its own main.py file:
 
-### 1. Dataset Processing (`src/dataset/main.py`)
+### 1. Dataset Processing (`src/dataset/run.py`)
 
 This script processes multiple fake news datasets and combines them into a unified Veritas dataset.
 
 **Usage:**
 ```bash
-cd src/dataset
-python main.py
+poetry run python src/dataset/run.py
 ```
 
 **What it does:**
-- Runs all processor scripts in the `../processor/` directory
+- Runs all processor scripts in the `processor/` directory
 - Combines outputs from multiple datasets (FakeNewsNet, ISOT, LIAR, Politifact, WELFake)
 - Removes duplicate entries based on content hashing
 - Creates a unified `veritas_dataset.csv` file
@@ -148,14 +151,13 @@ This script trains and tests a traditional machine learning model using TF-IDF f
 
 **Usage:**
 ```bash
-cd src/base_model
-python main.py
+poetry run python src/base_model/main.py
 ```
 
 **What it does:**
 - Trains a Logistic Regression model on TF-IDF features
 - Performs model inference on test articles
-- Currently uses sample data (TODO: integrate with actual dataset)
+- Creates comprehensive visualizations of model performance
 - Saves the trained model for later use
 
 **Features:**
@@ -163,6 +165,7 @@ python main.py
 - Cross-entropy loss for binary classification
 - Model persistence and loading
 - Real-time inference on new articles
+- Performance visualizations (confusion matrix, metrics, etc.)
 
 ### 3. RNN Model (`src/rnn_model/main.py`)
 
@@ -170,8 +173,7 @@ This script trains a deep learning model using Recurrent Neural Networks for seq
 
 **Usage:**
 ```bash
-cd src/rnn_model
-python main.py
+poetry run python src/rnn_model/main.py
 ```
 
 **What it does:**
@@ -202,46 +204,57 @@ To run the complete pipeline:
 
 1. **Process the dataset first:**
    ```bash
-   cd src/dataset
-   python main.py
+   poetry run python src/dataset/run.py
    ```
 
 2. **Train the base model:**
    ```bash
-   cd src/base_model
-   python main.py
+   poetry run python src/base_model/main.py
    ```
 
 3. **Train the RNN model:**
    ```bash
-   cd src/rnn_model
-   python main.py
+   poetry run python src/rnn_model/main.py
    ```
 
-### Make sure your virtual environment is activated before running any scripts:
+### Alternative: Using Poetry Shell
+
+You can also activate the Poetry environment once and run commands directly:
+
 ```bash
-source venv/bin/activate  # macOS/Linux
-# or
-venv\Scripts\activate     # Windows
+# Activate the Poetry environment
+poetry shell
+
+# Now you can run commands without 'poetry run'
+python src/base_model/main.py
+python src/dataset/run.py
+python src/rnn_model/main.py
+
+# Deactivate when done
+exit
 ```
 
-### Deactivating the Virtual Environment
+### Deactivating the Poetry Environment
 
 When you're done working on the project:
 ```bash
-deactivate
+exit  # If using poetry shell
+# or
+deactivate  # If the environment is still active
 ```
 
 ### Troubleshooting
 
 - **If you get permission errors**: Make sure you have write permissions in the project directory
-- **If packages fail to install**: Try upgrading pip first: `pip install --upgrade pip`
-- **If you need to recreate the environment**: Delete the `venv` folder and repeat the setup steps
-- **If Black formatting fails**: Make sure you're in the virtual environment and Black is installed
+- **If Poetry fails to install dependencies**: Try updating Poetry first: `poetry self update`
+- **If you need to recreate the environment**: Delete the `.venv` folder and run `poetry install` again
+- **If Black formatting fails**: Make sure you're in the Poetry environment and Black is installed
+- **If packages are missing**: Run `poetry install` to ensure all dependencies are installed
 
 ### Notes
 
-- Always activate the virtual environment before working on the project
-- The virtual environment keeps project dependencies isolated from your system Python
-- Remember to add `venv/` to your `.gitignore` file if it's not already there
-- Run `black .` before committing to ensure consistent code formatting
+- Always use `poetry run` or activate the Poetry environment before running scripts
+- Poetry automatically manages virtual environments and dependencies
+- The `pyproject.toml` file contains all project dependencies and configuration
+- Run `poetry run black .` before committing to ensure consistent code formatting
+- Poetry creates a `.venv` directory in your project folder for the virtual environment
