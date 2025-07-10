@@ -1,9 +1,10 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import trainer
-from model import RNNModel
-from training_config import TrainingConfig
+
+from src.rnn_model.model import RNNModel
+from src.rnn_model.trainer import train_model
+from src.rnn_model.training_config import TrainingConfig
 
 if __name__ == "__main__":
     # TODO: use dataloader

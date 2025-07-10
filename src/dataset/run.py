@@ -15,7 +15,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 
-from .dataset import VeritasDataset
+from src.dataset.dataset import VeritasDataset
 
 _DATASET_PATH = "./output"
 _DATASET_NAME = os.path.join(os.path.dirname(__file__), "veritas_dataset.csv")

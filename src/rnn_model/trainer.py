@@ -6,8 +6,9 @@ from typing import Tuple
 
 import torch
 import torch.nn as nn
-from training_config import TrainingConfig
-from training_history import TrainingHistory
+
+from src.rnn_model.training_config import TrainingConfig
+from src.rnn_model.training_history import TrainingHistory
 
 
 def train_model(
