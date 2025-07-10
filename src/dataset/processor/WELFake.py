@@ -8,8 +8,9 @@ Date: July 6, 2025
 """
 
 import os
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
 
 PROJECT_DIR = Path(__file__).resolve().parents[3]
 _DATA_PATH = os.path.join(PROJECT_DIR, "data")

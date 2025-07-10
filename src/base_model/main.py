@@ -1,7 +1,6 @@
-from model import model
-from train import train_model
-
-from src.dataset import split_dataset
+from src.base_model.model import model
+from src.base_model.train import train_model
+from src.dataset.run import split_dataset
 
 
 def main():
