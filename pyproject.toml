@@ -1,0 +1,15 @@
+[tool.poetry.dependencies]
+python = ">=3.10"
+torch = ">=2.0.0"
+pandas = ">=2.0.0"
+scikit-learn = ">=1.0.0"
+matplotlib = ">=3.0.0"
+seaborn = ">=0.10.0"
+
+[tool.poetry]
+name = "veritas"
+version = "0.1.0"
+description = "Veritas"
+packages = [
+    { include = "src" }
+]
