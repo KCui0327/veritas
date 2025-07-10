@@ -1,0 +1,7 @@
+[tool.poetry]
+name = "veritas"
+version = "0.1.0"
+description = "Veritas"
+packages = [
+    { include = "src" }
+]

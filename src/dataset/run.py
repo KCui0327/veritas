@@ -6,19 +6,19 @@ Author: Kenny Cui
 Date: July 6, 2025
 """
 
-import hashlib
-import pandas as pd
 import glob
+import hashlib
+import os
 import runpy
 
-from torch.utils.data import DataLoader
+import pandas as pd
 from sklearn.model_selection import train_test_split
+from torch.utils.data import DataLoader
 
-from dataset import VeritasDataset
-import os
+from .dataset import VeritasDataset
 
 _DATASET_PATH = "./output"
-_DATASET_NAME = "veritas_dataset.csv"
+_DATASET_NAME = os.path.join(os.path.dirname(__file__), "veritas_dataset.csv")
 _PROCESSOR_PATH = "processor"
 _DATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -53,7 +53,7 @@ def process_data():
 
 def split_dataset(validation_size=0.2, transform=None):
     # Create a VeritasDataset instance
-    dataset = VeritasDataset(_DATASET_NAME, transform=transform)
+    dataset = VeritasDataset(_DATASET_NAME)
 
     statements, verdicts = [], []
 
