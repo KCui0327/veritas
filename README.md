@@ -9,6 +9,18 @@ Veritas is a comprehensive fake news detection system that uses multiple machine
 - **RNN Model**: Deep learning approach using Recurrent Neural Networks
 - **Dataset Processing**: Automated pipeline to process multiple fake news datasets
 
+## Poetry Scripts
+
+The project provides convenient Poetry scripts for common tasks:
+
+| Script | Command | Description |
+|--------|---------|-------------|
+| `gather-data` | `poetry run gather-data` | Process and combine multiple fake news datasets into a unified dataset |
+| `train` | `poetry run train` | Train the RNN model for fake news detection |
+| `visualize` | `poetry run visualize` | Generate visualizations of RNN training results |
+
+These scripts are defined in `pyproject.toml` and provide a simple interface to the project's main functionality.
+
 ## Getting Started
 
 This guide will help you set up the development environment for the veritas project.
@@ -126,13 +138,15 @@ poetry run black --check .
 
 The project contains three main components, each with its own main.py file:
 
-### 1. Dataset Processing (`src/dataset/run.py`)
+### 1. Dataset Processing (`src/dataset/process_data.py`)
 
 This script processes multiple fake news datasets and combines them into a unified Veritas dataset.
 
 **Usage:**
 ```bash
-poetry run python src/dataset/run.py
+poetry run python src/dataset/process_data.py
+# Or use the Poetry script:
+poetry run gather-data
 ```
 
 **What it does:**
@@ -198,13 +212,37 @@ The training can be customized by modifying the `TrainingConfig` in `main.py`:
 - Loss function: CrossEntropyLoss
 - Save directory: "checkpoints"
 
-### Running All Components
+### Using Poetry Scripts (Recommended)
 
-To run the complete pipeline:
+The project provides convenient Poetry scripts for common tasks. These are the recommended way to run the project:
 
-1. **Process the dataset first:**
+1. **Process and gather data:**
    ```bash
-   poetry run python src/dataset/run.py
+   poetry run gather-data
+   ```
+
+2. **Train the RNN model:**
+   ```bash
+   poetry run train
+   ```
+
+3. **Visualize training results:**
+   ```bash
+   poetry run visualize
+   ```
+
+**Note:** The base model doesn't have a Poetry script yet, so you'll need to run it directly:
+```bash
+poetry run python src/base_model/main.py
+```
+
+### Alternative: Direct Python Execution
+
+You can also run the Python files directly if you prefer:
+
+1. **Process the dataset:**
+   ```bash
+   poetry run python src/dataset/process_data.py
    ```
 
 2. **Train the base model:**
@@ -217,6 +255,35 @@ To run the complete pipeline:
    poetry run python src/rnn_model/main.py
    ```
 
+4. **Visualize RNN training results:**
+   ```bash
+   poetry run python src/rnn_model/visualize.py
+   ```
+
+### Running All Components
+
+To run the complete pipeline using Poetry scripts:
+
+1. **Process the dataset first:**
+   ```bash
+   poetry run gather-data
+   ```
+
+2. **Train the base model:**
+   ```bash
+   poetry run python src/base_model/main.py
+   ```
+
+3. **Train the RNN model:**
+   ```bash
+   poetry run train
+   ```
+
+4. **Visualize the RNN training results:**
+   ```bash
+   poetry run visualize
+   ```
+
 ### Alternative: Using Poetry Shell
 
 You can also activate the Poetry environment once and run commands directly:
@@ -225,9 +292,14 @@ You can also activate the Poetry environment once and run commands directly:
 # Activate the Poetry environment
 poetry shell
 
-# Now you can run commands without 'poetry run'
+# Now you can run Poetry scripts without 'poetry run'
+gather-data
+train
+visualize
+
+# Or run Python files directly
 python src/base_model/main.py
-python src/dataset/run.py
+python src/dataset/process_data.py
 python src/rnn_model/main.py
 
 # Deactivate when done
