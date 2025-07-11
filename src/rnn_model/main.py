@@ -30,9 +30,7 @@ if __name__ == "__main__":
     )
 
     print("Getting dataloaders")
-    train_dataloader, val_dataloader = get_dataloaders(
-        max_training_records=10000, max_validation_records=10000
-    )
+    train_dataloader, val_dataloader = get_dataloaders()
 
     print("Creating optimizer")
     optimizer = optim.Adam(model.parameters(), lr=lr)
@@ -40,7 +38,7 @@ if __name__ == "__main__":
         train_dataloader=train_dataloader,
         val_dataloader=val_dataloader,
         save_dir="checkpoints",
-        log_interval=10,
+        log_interval=16,
         eval_interval=1,
         epochs=5,
         optimizer=optimizer,

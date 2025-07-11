@@ -10,6 +10,8 @@ class TrainingHistory:
     def __init__(self):
         self.train_losses = []
         self.val_losses = []
+        self.train_accuracies = []
+        self.val_accuracies = []
         self.learning_rates = []
         self.epoch_times = []
 
@@ -17,13 +19,16 @@ class TrainingHistory:
         self,
         train_loss: float,
         val_loss: Optional[float] = None,
+        train_accuracy: Optional[float] = None,
+        val_accuracy: Optional[float] = None,
         lr: Optional[float] = None,
         epoch_time: Optional[float] = None,
     ):
         """Add epoch results to history."""
         self.train_losses.append(train_loss)
         self.val_losses.append(val_loss if val_loss is not None else float("inf"))
-
+        self.train_accuracies.append(train_accuracy)
+        self.val_accuracies.append(val_accuracy)
         if lr is not None:
             self.learning_rates.append(lr)
 
@@ -37,6 +42,8 @@ class TrainingHistory:
             "val_losses": self.val_losses,
             "learning_rates": self.learning_rates,
             "epoch_times": self.epoch_times,
+            "train_accuracies": self.train_accuracies,
+            "val_accuracies": self.val_accuracies,
         }
 
         with open(filepath, "w") as f:
@@ -55,6 +62,16 @@ class TrainingHistory:
         axes[0, 0].set_ylabel("Loss")
         axes[0, 0].legend()
         axes[0, 0].grid(True)
+
+        # Accuracy curves
+        axes[1, 0].plot(self.train_accuracies, label="Train Accuracy")
+        if any(acc != 0.0 for acc in self.val_accuracies):
+            axes[1, 0].plot(self.val_accuracies, label="Val Accuracy")
+        axes[1, 0].set_title("Training and Validation Accuracy")
+        axes[1, 0].set_xlabel("Epoch")
+        axes[1, 0].set_ylabel("Accuracy")
+        axes[1, 0].legend()
+        axes[1, 0].grid(True)
 
         # Learning rate
         if self.learning_rates:

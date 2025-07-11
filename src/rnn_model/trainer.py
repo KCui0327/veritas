@@ -60,14 +60,11 @@ def train_model(
 
             train_loss += loss.item()
 
-            # Calculate accuracy
             with torch.no_grad():
-                # For binary classification, outputs are probabilities (after sigmoid)
                 preds = (outputs >= 0.5).float()
                 train_correct += (preds == labels).sum().item()
                 train_total += labels.numel()
 
-            # Logging
             if batch_idx % config.log_interval == 0:
                 batch_acc = (train_correct / train_total) if train_total > 0 else 0.0
                 print(
@@ -89,7 +86,6 @@ def train_model(
             val_total = 0
 
             with torch.no_grad():
-
                 for inputs, labels in config.val_dataloader:
                     if config.use_cuda:
                         inputs = inputs.to(torch.device("cuda"))
@@ -99,7 +95,6 @@ def train_model(
                     loss = config.loss_function(outputs, labels)
                     val_loss += loss.item()
 
-                    # Calculate validation accuracy
                     preds = (outputs >= 0.5).float()
                     val_correct += (preds == labels).sum().item()
                     val_total += labels.numel()
@@ -114,6 +109,8 @@ def train_model(
             val_loss=avg_val_loss if val_loss is not None else None,
             lr=config.learning_rate,
             epoch_time=epoch_time,
+            train_accuracy=avg_train_acc,
+            val_accuracy=avg_val_acc,
         )
 
         # Logging
