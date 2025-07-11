@@ -42,14 +42,15 @@ def train_model(
         model.train()
         train_loss = 0.0
 
-        for batch_idx, batch in enumerate(config.train_dataloader):
+        for batch_idx, (inputs, labels) in enumerate(config.train_dataloader):
             if config.use_cuda:
-                batch = [b.to(torch.device("cuda")) for b in batch]
+                inputs = inputs.to(torch.device("cuda"))
+                labels = labels.to(torch.device("cuda"))
 
             config.optimizer.zero_grad()
 
-            outputs = model(batch)
-            loss = config.loss_function(outputs, batch)
+            outputs = model(inputs)
+            loss = config.loss_function(outputs, labels)
             loss.backward()
             config.optimizer.step()
 

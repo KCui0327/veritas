@@ -51,7 +51,7 @@ def process_data():
     df.to_csv("veritas_dataset.csv", index=False, encoding="utf-8")
 
 
-def split_dataset(validation_size=0.2, transform=None):
+def split_dataset(validation_size=0.2):
     # Create a VeritasDataset instance
     dataset = VeritasDataset(_DATASET_NAME)
 
