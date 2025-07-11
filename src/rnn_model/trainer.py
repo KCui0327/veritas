@@ -6,6 +6,7 @@ from typing import Tuple
 
 import torch
 import torch.nn as nn
+from sklearn.metrics import precision_score, recall_score, f1_score
 
 from src.rnn_model.training_config import TrainingConfig
 from src.rnn_model.training_history import TrainingHistory
@@ -45,6 +46,8 @@ def train_model(
 
         train_correct = 0
         train_total = 0
+        all_train_preds = []
+        all_train_labels = []
 
         for batch_idx, (inputs, labels) in enumerate(config.train_dataloader):
             if config.use_cuda:
@@ -65,6 +68,10 @@ def train_model(
                 train_correct += (preds == labels).sum().item()
                 train_total += labels.numel()
 
+                # Store predictions and labels for metric calculations
+                all_train_preds.extend(preds.cpu().numpy().flatten())
+                all_train_labels.extend(labels.cpu().numpy().flatten())
+
             if batch_idx % config.log_interval == 0:
                 batch_acc = (train_correct / train_total) if train_total > 0 else 0.0
                 print(
@@ -75,8 +82,22 @@ def train_model(
         avg_train_loss = train_loss / len(config.train_dataloader)
         avg_train_acc = train_correct / train_total if train_total > 0 else 0.0
 
+        # Calculate training metrics
+        train_precision = precision_score(
+            all_train_labels, all_train_preds, average="binary", zero_division=0
+        )
+        train_recall = recall_score(
+            all_train_labels, all_train_preds, average="binary", zero_division=0
+        )
+        train_f1 = f1_score(
+            all_train_labels, all_train_preds, average="binary", zero_division=0
+        )
+
         # Validation phase
         val_loss = None
+        val_precision = None
+        val_recall = None
+        val_f1 = None
 
         if config.val_dataloader and (epoch + 1) % config.eval_interval == 0:
             model.eval()
@@ -84,6 +105,8 @@ def train_model(
             val_loss = 0.0
             val_correct = 0
             val_total = 0
+            all_val_preds = []
+            all_val_labels = []
 
             with torch.no_grad():
                 for inputs, labels in config.val_dataloader:
@@ -99,8 +122,23 @@ def train_model(
                     val_correct += (preds == labels).sum().item()
                     val_total += labels.numel()
 
+                    # Store predictions and labels for metric calculations
+                    all_val_preds.extend(preds.cpu().numpy().flatten())
+                    all_val_labels.extend(labels.cpu().numpy().flatten())
+
             avg_val_loss = val_loss / len(config.val_dataloader)
             avg_val_acc = val_correct / val_total if val_total > 0 else 0.0
+
+            # Calculate validation metrics
+            val_precision = precision_score(
+                all_val_labels, all_val_preds, average="binary", zero_division=0
+            )
+            val_recall = recall_score(
+                all_val_labels, all_val_preds, average="binary", zero_division=0
+            )
+            val_f1 = f1_score(
+                all_val_labels, all_val_preds, average="binary", zero_division=0
+            )
 
         epoch_time = time.time() - epoch_start_time
 
@@ -111,15 +149,27 @@ def train_model(
             epoch_time=epoch_time,
             train_accuracy=avg_train_acc,
             val_accuracy=avg_val_acc,
+            train_precision=train_precision,
+            val_precision=val_precision,
+            train_recall=train_recall,
+            val_recall=val_recall,
+            train_f1=train_f1,
+            val_f1=val_f1,
         )
 
         # Logging
         log_msg = f"Epoch {epoch+1}/{config.epochs} - "
         log_msg += f"Train Loss: {avg_train_loss:.4f}, "
         log_msg += f"Train Acc: {avg_train_acc:.4f}, "
+        log_msg += f"Train Prec: {train_precision:.4f}, "
+        log_msg += f"Train Rec: {train_recall:.4f}, "
+        log_msg += f"Train F1: {train_f1:.4f}, "
         if val_loss is not None:
             log_msg += f"Val Loss: {avg_val_loss:.4f}, "
             log_msg += f"Val Acc: {avg_val_acc:.4f}, "
+            log_msg += f"Val Prec: {val_precision:.4f}, "
+            log_msg += f"Val Rec: {val_recall:.4f}, "
+            log_msg += f"Val F1: {val_f1:.4f}, "
         log_msg += f"LR: {config.learning_rate:.6f}, Time: {epoch_time:.2f}s"
         print(log_msg)
 
@@ -181,5 +231,13 @@ def load_training_history(history_path: str) -> TrainingHistory:
     history.val_losses = history_dict["val_losses"]
     history.learning_rates = history_dict["learning_rates"]
     history.epoch_times = history_dict["epoch_times"]
+    history.train_accuracies = history_dict.get("train_accuracies", [])
+    history.val_accuracies = history_dict.get("val_accuracies", [])
+    history.train_precisions = history_dict.get("train_precisions", [])
+    history.val_precisions = history_dict.get("val_precisions", [])
+    history.train_recalls = history_dict.get("train_recalls", [])
+    history.val_recalls = history_dict.get("val_recalls", [])
+    history.train_f1_scores = history_dict.get("train_f1_scores", [])
+    history.val_f1_scores = history_dict.get("val_f1_scores", [])
 
     return history

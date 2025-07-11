@@ -19,23 +19,24 @@ _DATASET_NAME = os.path.join(os.path.dirname(__file__), "veritas_dataset.csv")
 def get_dataloaders(
     train_size=0.8,
     batch_size=32,
-    max_training_records=1000,
-    max_validation_records=1000,
+    max_records=10000,
 ) -> Tuple[DataLoader, DataLoader]:
     """
     Get the dataloaders for the training and validation sets.
     """
     dataset = VeritasDataset(_DATASET_NAME)
+    max_records = min(max_records, len(dataset))
+    dataset = Subset(dataset, range(max_records))
 
     train_size = int(train_size * len(dataset))
     val_size = len(dataset) - train_size
 
     train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 
-    train_dataset = Subset(train_dataset, range(max_training_records))
-    val_dataset = Subset(val_dataset, range(max_validation_records))
+    print(f"Dataset info:")
+    print(f"  Total dataset size: {len(dataset)}")
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
 
     return train_loader, val_loader
