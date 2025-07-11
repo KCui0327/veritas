@@ -49,6 +49,17 @@ class TrainingHistory:
         with open(filepath, "w") as f:
             json.dump(history_dict, f, indent=2)
 
+    def load(self, filepath: str):
+        """Load training history from JSON file."""
+        with open(filepath, "r") as f:
+            history_dict = json.load(f)
+        self.train_losses = history_dict["train_losses"]
+        self.val_losses = history_dict["val_losses"]
+        self.train_accuracies = history_dict["train_accuracies"]
+        self.val_accuracies = history_dict["val_accuracies"]
+        self.learning_rates = history_dict["learning_rates"]
+        self.epoch_times = history_dict["epoch_times"]
+
     def plot_training_curves(self, save_path: Optional[str] = None):
         """Plot training curves."""
         fig, axes = plt.subplots(2, 2, figsize=(15, 10))

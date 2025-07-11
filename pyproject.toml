@@ -13,3 +13,8 @@ description = "Veritas"
 packages = [
     { include = "src" }
 ]
+
+[tool.poetry.scripts]
+train = "src.rnn_model.main:main"
+gather-data = "src.dataset.main:process_data"
+visualize = "src.rnn_model.visualize:main"
