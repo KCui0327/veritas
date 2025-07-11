@@ -7,7 +7,8 @@ from src.rnn_model.model import FakeNewsDetector
 from src.rnn_model.trainer import train_model
 from src.rnn_model.training_config import TrainingConfig
 
-if __name__ == "__main__":
+
+def main():
     # Hyperparameters
     vocab_size = 20000
     embed_dim = 128
@@ -47,3 +48,7 @@ if __name__ == "__main__":
     )
 
     train_model(model, training_config)
+
+
+if __name__ == "__main__":
+    main()

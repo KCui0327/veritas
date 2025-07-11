@@ -9,7 +9,7 @@ _DATASET_PATH = "./output"
 _PROCESSOR_PATH = "processor"
 
 
-def process_data():
+def main():
     for file in os.listdir(_PROCESSOR_PATH):
         if file.endswith(".py"):
             print(f"Running processor: {file}")
@@ -38,5 +38,5 @@ def process_data():
 
 
 if __name__ == "__main__":
-    process_data()
+    main()
     print("Dataset processing complete. DataLoader created.")

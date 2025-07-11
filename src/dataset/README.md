@@ -12,9 +12,16 @@ These operations include:
 ### How to Use this Package
 
 1. import the package to your package
-2. The run function in `src/dataset/run.py` will run the entire logic
+2. The main function in `src/dataset/process_data.py` will run the entire logic
 3. In your package, do a get_dataloader call to get the dataloader for training and validation
 
-> Note: Uncomment the first line of the run function in `src/dataset/run.py` to reprocess the data.
+**Usage:**
+```bash
+# Using Poetry script (recommended)
+poetry run gather-data
+
+# Or run directly
+poetry run python src/dataset/process_data.py
+```
 
 
