@@ -8,8 +8,6 @@ from torch.utils.data import DataLoader
 # Embedding maps each of the 20 000 tokens to a 128-dimensional dense vector.
 
 
-
-
 # Attention module
 # The attention module will dynamically weigh each hidden state instead of simply taking the final LSTM output.
 # ie.  “look back” at earlier states
@@ -37,6 +35,7 @@ class FakeNewsDetector(nn.Module):
         output_dim,
     ):
         super(FakeNewsDetector, self).__init__()
+        self.name = "FakeNewsDetector"
         self.embedding = nn.Embedding(vocab_size, embed_dim)
         self.lstm = nn.LSTM(
             input_size=embed_dim,

@@ -1,6 +1,7 @@
 __pycache__/
 .DS_Store
 *.pyc
+checkpoints/
 
 # PyCharm specific files
 .idea

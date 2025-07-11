@@ -18,6 +18,7 @@ if __name__ == "__main__":
     output_dim = 1
     lr = 1e-3
 
+    print("Creating model")
     model = FakeNewsDetector(
         vocab_size,
         embed_dim,
@@ -28,7 +29,12 @@ if __name__ == "__main__":
         output_dim,
     )
 
-    train_dataloader, val_dataloader = get_dataloaders()
+    print("Getting dataloaders")
+    train_dataloader, val_dataloader = get_dataloaders(
+        max_training_records=10000, max_validation_records=10000
+    )
+
+    print("Creating optimizer")
     optimizer = optim.Adam(model.parameters(), lr=lr)
     training_config = TrainingConfig(
         train_dataloader=train_dataloader,
@@ -36,7 +42,7 @@ if __name__ == "__main__":
         save_dir="checkpoints",
         log_interval=10,
         eval_interval=1,
-        epochs=100,
+        epochs=5,
         optimizer=optimizer,
         loss_function=nn.BCELoss(),
         use_cuda=torch.cuda.is_available(),

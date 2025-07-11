@@ -2,7 +2,6 @@
 This code package contains modules for processing datasets and creating data loaders.
 """
 
-from src.dataset.run import run as get_dataloaders
-from src.dataset.run import split_dataset
+from src.dataset.data_loaders import get_dataloaders
 
-__all__ = ["get_dataloaders", "split_dataset"]
+__all__ = ["get_dataloaders"]
