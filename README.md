@@ -16,8 +16,10 @@ The project provides convenient Poetry scripts for common tasks:
 | Script | Command | Description |
 |--------|---------|-------------|
 | `gather-data` | `poetry run gather-data` | Process and combine multiple fake news datasets into a unified dataset |
-| `train` | `poetry run train` | Train the RNN model for fake news detection |
-| `visualize` | `poetry run visualize` | Generate visualizations of RNN training results |
+| `train-rnn` | `poetry run train-rnn` | Train the RNN model for fake news detection |
+| `train-base` | `poetry run train-base` | Train the base model using TF-IDF and Logistic Regression |
+| `visualize-rnn` | `poetry run visualize-rnn` | Generate visualizations of RNN training results |
+| `visualize-base` | `poetry run visualize-base` | Generate visualizations of base model performance |
 
 These scripts are defined in `pyproject.toml` and provide a simple interface to the project's main functionality.
 

@@ -8,6 +8,9 @@ import torch
 import torch.nn as nn
 from sklearn.metrics import precision_score, recall_score, f1_score
 
+from src.dataset import get_dataloaders
+from src.rnn_model.model import FakeNewsDetector
+from src.rnn_model.trainer import train_model
 from src.rnn_model.training_config import TrainingConfig
 from src.rnn_model.training_history import TrainingHistory
 
@@ -143,6 +146,7 @@ def train_model(
         epoch_time = time.time() - epoch_start_time
 
         history.add_epoch(
+            epoch=epoch,
             train_loss=avg_train_loss,
             val_loss=avg_val_loss if val_loss is not None else None,
             lr=config.learning_rate,
@@ -241,3 +245,49 @@ def load_training_history(history_path: str) -> TrainingHistory:
     history.val_f1_scores = history_dict.get("val_f1_scores", [])
 
     return history
+
+
+def main():
+    # Hyperparameters
+    vocab_size = 20000
+    embed_dim = 128
+    hidden_dim = 128
+    num_layers = 2
+    dropout_rate = 0.5
+    bidirectional = True
+    output_dim = 1
+    lr = 1e-2
+
+    print("Creating model")
+    model = FakeNewsDetector(
+        vocab_size,
+        embed_dim,
+        hidden_dim,
+        num_layers,
+        dropout_rate,
+        bidirectional,
+        output_dim,
+    )
+
+    print("Getting dataloaders")
+    train_dataloader, val_dataloader = get_dataloaders(batch_size=64, max_records=1000)
+
+    print("Creating optimizer")
+    optimizer = optim.Adam(model.parameters(), lr=lr)
+    training_config = TrainingConfig(
+        train_dataloader=train_dataloader,
+        val_dataloader=val_dataloader,
+        save_dir="checkpoints",
+        log_interval=16,
+        eval_interval=1,
+        epochs=20,
+        optimizer=optimizer,
+        loss_function=nn.BCELoss(),
+        use_cuda=torch.cuda.is_available(),
+    )
+
+    train_model(model, training_config)
+
+
+if __name__ == "__main__":
+    main()

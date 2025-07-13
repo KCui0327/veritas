@@ -15,6 +15,8 @@ packages = [
 ]
 
 [tool.poetry.scripts]
-train = "src.rnn_model.main:main"
+train-rnn = "src.rnn_model.train:main"
+train-base = "src.base_model.train:main"
 gather-data = "src.dataset.process_data:main"
-visualize = "src.rnn_model.visualize:main"
+visualize-rnn = "src.rnn_model.visualize:main"
+visualize-base = "src.base_model.visualize:main"

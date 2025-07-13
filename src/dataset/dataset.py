@@ -88,7 +88,7 @@ class VeritasDataset(Dataset):
     def __getitem__(self, idx):
         input_tensor = self._text_to_tensor(self.data_frame["statement"][idx])
         label_tensor = torch.tensor(
-            0 if self.data_frame["verdict"][idx] == "True" else 1, dtype=torch.float
+            0 if self.data_frame["verdict"][idx] else 1, dtype=torch.float
         )
 
         return input_tensor, label_tensor
