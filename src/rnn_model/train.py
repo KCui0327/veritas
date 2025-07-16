@@ -6,11 +6,11 @@ from typing import Tuple
 
 import torch
 import torch.nn as nn
-from sklearn.metrics import precision_score, recall_score, f1_score
+from sklearn.metrics import f1_score, precision_score, recall_score
 
 from src.dataset import get_dataloaders
 from src.rnn_model.model import FakeNewsDetector
-from src.rnn_model.trainer import train_model
+from src.rnn_model.train import train_model
 from src.rnn_model.training_config import TrainingConfig
 from src.rnn_model.training_history import TrainingHistory
 
