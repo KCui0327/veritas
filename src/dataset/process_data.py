@@ -5,8 +5,11 @@ import runpy
 
 import pandas as pd
 
-_DATASET_PATH = "./output"
-_PROCESSOR_PATH = "processor"
+# Get the directory where this script is located
+_CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+_DATASET_PATH = os.path.join(_CURRENT_DIR, "output")
+_PROCESSOR_PATH = os.path.join(_CURRENT_DIR, "processor")
+_OUTPUT_FILE = os.path.join(_CURRENT_DIR, "veritas_dataset.csv")
 
 
 def main():
@@ -34,7 +37,7 @@ def main():
     )
     df.drop_duplicates(subset=["id"], inplace=True, keep="first")
 
-    df.to_csv("veritas_dataset.csv", index=False, encoding="utf-8")
+    df.to_csv(_OUTPUT_FILE, index=False, encoding="utf-8")
 
 
 if __name__ == "__main__":
