@@ -7,8 +7,9 @@ from typing import Tuple
 import torch
 import torch.nn as nn
 
-from src.rnn_model.training_config import TrainingConfig
-from src.rnn_model.training_history import TrainingHistory
+from src.data_models.training_config import TrainingConfig
+from src.data_models.training_history import TrainingHistory
+from src.rnn_model.evaluate import evaluate_model
 
 
 def train_model(
@@ -65,31 +66,16 @@ def train_model(
 
         avg_train_loss = train_loss / len(config.train_dataloader)
 
-        # Validation phase
-        val_loss = None
-
         if config.val_dataloader and (epoch + 1) % config.eval_interval == 0:
-            model.eval()
-
-            val_loss = 0.0
-
-            with torch.no_grad():
-                for inputs, labels in config.val_dataloader:
-                    if config.use_cuda:
-                        inputs = inputs.to(torch.device("cuda"))
-                        labels = labels.to(torch.device("cuda"))
-
-                    outputs = model(inputs)
-                    loss = config.loss_function(outputs, labels)
-                    val_loss += loss.item()
-
-            avg_val_loss = val_loss / len(config.val_dataloader)
+            val_metric = evaluate_model(
+                model, config.val_dataloader, config.loss_function, config.use_cuda
+            )
 
         epoch_time = time.time() - epoch_start_time
 
         history.add_epoch(
             train_loss=avg_train_loss,
-            val_loss=avg_val_loss if val_loss is not None else None,
+            val_loss=val_metric.avg_loss if val_metric is not None else None,
             lr=config.learning_rate,
             epoch_time=epoch_time,
         )
@@ -97,8 +83,8 @@ def train_model(
         # Logging
         log_msg = f"Epoch {epoch+1}/{config.epochs} - "
         log_msg += f"Train Loss: {avg_train_loss:.4f}, "
-        if val_loss is not None:
-            log_msg += f"Val Loss: {avg_val_loss:.4f}, "
+        if val_metric is not None:
+            log_msg += f"Val Loss: {val_metric.avg_loss:.4f}, "
         log_msg += f"LR: {config.learning_rate:.6f}, Time: {epoch_time:.2f}s"
         print(log_msg)
 

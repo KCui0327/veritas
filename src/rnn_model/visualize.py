@@ -1,8 +1,18 @@
-from src.data_models.training_history import TrainingHistory
 import os
 import sys
 
+from src.data_models.evaluation_metric import EvaluationMetric
+from src.data_models.training_history import TrainingHistory
+
 _VISUALIZATION_PATH = "visualizations/"
+
+
+def visualize_training_history(history: TrainingHistory, save_path: str):
+    pass
+
+
+def visualize_evaluation_metric(metric: EvaluationMetric, save_path: str):
+    pass
 
 
 def main():
