@@ -16,8 +16,10 @@ The project provides convenient Poetry scripts for common tasks:
 | Script | Command | Description |
 |--------|---------|-------------|
 | `gather-data` | `poetry run gather-data` | Process and combine multiple fake news datasets into a unified dataset |
-| `train` | `poetry run train` | Train the RNN model for fake news detection |
-| `visualize` | `poetry run visualize` | Generate visualizations of RNN training results |
+| `train-rnn` | `poetry run train-rnn` | Train the RNN model for fake news detection |
+| `train-base` | `poetry run train-base` | Train the base model using TF-IDF and Logistic Regression |
+| `visualize-rnn` | `poetry run visualize-rnn` | Generate visualizations of RNN training results |
+| `visualize-base` | `poetry run visualize-base` | Generate visualizations of base model performance |
 
 These scripts are defined in `pyproject.toml` and provide a simple interface to the project's main functionality.
 
@@ -138,15 +140,15 @@ poetry run black --check .
 
 The project contains three main components, each with its own main.py file:
 
-### 1. Dataset Processing (`src/dataset/process_data.py`)
+### 1. Dataset Processing (`src/dataset/generate_veritas_data.py`)
 
 This script processes multiple fake news datasets and combines them into a unified Veritas dataset.
 
 **Usage:**
 ```bash
-poetry run python src/dataset/process_data.py
+poetry run python src/dataset/generate_veritas_data.py
 # Or use the Poetry script:
-poetry run gather-data
+poetry run generate-data
 ```
 
 **What it does:**
