@@ -9,7 +9,7 @@ import pandas as pd
 _CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 _DATASET_PATH = os.path.join(_CURRENT_DIR, "output")
 _PROCESSOR_PATH = os.path.join(_CURRENT_DIR, "processor")
-_OUTPUT_FILE = os.path.join(_CURRENT_DIR, "veritas_dataset.csv")
+_OUTPUT_FILE = "data/veritas_dataset.csv"
 
 
 def main():

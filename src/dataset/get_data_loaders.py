@@ -6,7 +6,6 @@ Author: Kenny Cui
 Date: July 6, 2025
 """
 
-import os
 import random
 from typing import Tuple
 
@@ -15,7 +14,7 @@ from torch.utils.data import DataLoader, Subset, random_split
 
 from src.data_models.dataset import VeritasDataset
 
-_DATASET_NAME = os.path.join(os.path.dirname(__file__), "veritas_dataset.csv")
+_DATASET_NAME = "data/veritas_dataset.csv"
 
 
 def get_dataloaders(

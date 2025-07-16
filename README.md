@@ -140,15 +140,15 @@ poetry run black --check .
 
 The project contains three main components, each with its own main.py file:
 
-### 1. Dataset Processing (`src/dataset/process_data.py`)
+### 1. Dataset Processing (`src/dataset/generate_veritas_data.py`)
 
 This script processes multiple fake news datasets and combines them into a unified Veritas dataset.
 
 **Usage:**
 ```bash
-poetry run python src/dataset/process_data.py
+poetry run python src/dataset/generate_veritas_data.py
 # Or use the Poetry script:
-poetry run gather-data
+poetry run generate-data
 ```
 
 **What it does:**
