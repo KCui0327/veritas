@@ -10,10 +10,10 @@ import os
 import random
 from typing import Tuple
 
-from torch.utils.data import DataLoader, Subset, random_split
 import torch
+from torch.utils.data import DataLoader, Subset, random_split
 
-from src.dataset.dataset import VeritasDataset
+from src.data_models.dataset import VeritasDataset
 
 _DATASET_NAME = os.path.join(os.path.dirname(__file__), "veritas_dataset.csv")
 

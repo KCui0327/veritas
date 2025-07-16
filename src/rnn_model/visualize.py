@@ -1,4 +1,4 @@
-from src.rnn_model.training_history import TrainingHistory
+from src.data_models.training_history import TrainingHistory
 import os
 import sys
 
