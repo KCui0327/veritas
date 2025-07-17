@@ -22,8 +22,7 @@ class TrainingConfig:
     loss_function: Callable = None
     use_cuda: bool = False
 
-    # Logging and saving
-    save_dir: Optional[str] = None
+    # Logging
     log_interval: int = 10  # log every n batches
     eval_interval: int = 1  # evaluate every n epochs
 
