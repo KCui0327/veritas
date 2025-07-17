@@ -8,6 +8,7 @@ import torch.nn as nn
 
 from src.data_models.evaluation_metric import EvaluationMetric
 from src.dataset.get_data_loaders import get_dataloaders
+from src.util.logger import logger
 
 
 def evaluate_model(
@@ -23,8 +24,10 @@ def evaluate_model(
     training process.
     """
 
+    logger.info("Evaluating model")
     model.eval()
     if use_cuda:
+        logger.info("Using CUDA")
         model.cuda()
 
     metric = EvaluationMetric(
@@ -54,21 +57,51 @@ def evaluate_model(
             all_train_labels.extend(labels.cpu().numpy())
             all_train_preds.extend(preds.cpu().numpy())
 
-        metric.avg_loss = metric.total_loss / len(dataloader)
-        metric.inference_time = time.time() - start_time
-
-    metric.dataset_num_true_labels = sum(all_train_labels)
-    metric.dataset_num_false_labels = (
-        len(all_train_labels) - metric.dataset_num_true_labels
-    )
-
     all_train_labels = np.array(all_train_labels)
     all_train_preds = np.array(all_train_preds)
 
-    metric.num_true_positives = sum((all_train_labels == 1) & (all_train_preds == 1))
-    metric.num_false_positives = sum((all_train_labels == 0) & (all_train_preds == 1))
-    metric.num_true_negatives = sum((all_train_labels == 0) & (all_train_preds == 0))
-    metric.num_false_negatives = sum((all_train_labels == 1) & (all_train_preds == 0))
+    metric.avg_loss = float(metric.total_loss / len(dataloader))
+    metric.inference_time = time.time() - start_time
+    metric.dataset_num_true_labels = int(sum(all_train_labels))
+    metric.dataset_num_false_labels = int(
+        len(all_train_labels) - metric.dataset_num_true_labels
+    )
+
+    metric.num_true_positives = int(
+        sum((all_train_labels == 1) & (all_train_preds == 1))
+    )
+    metric.num_false_positives = int(
+        sum((all_train_labels == 0) & (all_train_preds == 1))
+    )
+    metric.num_true_negatives = int(
+        sum((all_train_labels == 0) & (all_train_preds == 0))
+    )
+    metric.num_false_negatives = int(
+        sum((all_train_labels == 1) & (all_train_preds == 0))
+    )
+
+    if metric.dataset_size != 0:
+        metric.accuracy = float(
+            (metric.num_true_positives + metric.num_true_negatives)
+            / metric.dataset_size
+        )
+
+    if metric.num_true_positives + metric.num_false_positives != 0:
+        metric.precision = float(
+            metric.num_true_positives
+            / (metric.num_true_positives + metric.num_false_positives)
+        )
+
+    if metric.num_true_positives + metric.num_false_negatives != 0:
+        metric.recall = float(
+            metric.num_true_positives
+            / (metric.num_true_positives + metric.num_false_negatives)
+        )
+
+    if (metric.precision + metric.recall) != 0:
+        metric.f1_score = float(
+            2 * (metric.precision * metric.recall) / (metric.precision + metric.recall)
+        )
 
     return metric
 

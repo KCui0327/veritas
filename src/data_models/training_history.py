@@ -1,119 +1,33 @@
 import json
-from typing import Optional
+from dataclasses import dataclass, field
+from typing import List
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
-import numpy as np
 import seaborn as sns
 
+from src.data_models.evaluation_metric import EvaluationMetric
 
+
+@dataclass
 class TrainingHistory:
     """Class to track training history for visualization."""
 
-    def __init__(self):
-        self.epochs = []
-        self.epoch_times = []
-
-        self.train_losses = []
-        self.val_losses = []
-
-        self.train_accuracies = []
-        self.train_precisions = []
-        self.train_recalls = []
-        self.train_f1_scores = []
-        self.train_confusion_matrices = []
-
-        self.val_accuracies = []
-        self.val_precisions = []
-        self.val_recalls = []
-        self.val_f1_scores = []
-        self.val_confusion_matrices = []
-
-        self.learning_rates = []
+    epoch_nums: List[int] = field(default_factory=list)
+    train_metrics: List[EvaluationMetric] = field(default_factory=list)
+    val_metrics: List[EvaluationMetric] = field(default_factory=list)
 
     def add_epoch(
         self,
-        epoch: int,
-        train_loss: float,
-        val_loss: Optional[float] = None,
-        train_accuracy: Optional[float] = None,
-        val_accuracy: Optional[float] = None,
-        train_precision: Optional[float] = None,
-        val_precision: Optional[float] = None,
-        train_recall: Optional[float] = None,
-        val_recall: Optional[float] = None,
-        train_f1: Optional[float] = None,
-        val_f1: Optional[float] = None,
-        lr: Optional[float] = None,
-        epoch_time: Optional[float] = None,
-        train_confusion_matrix: Optional[np.ndarray] = None,
-        val_confusion_matrix: Optional[np.ndarray] = None,
+        epoch_num: int,
+        train_metric: EvaluationMetric,
+        val_metric: EvaluationMetric,
     ):
-        """Add epoch results to history."""
-        self.epochs.append(epoch)
-        self.train_losses.append(train_loss)
-        self.val_losses.append(val_loss if val_loss is not None else float("inf"))
-        self.train_accuracies.append(train_accuracy)
-        self.val_accuracies.append(val_accuracy)
-        self.train_precisions.append(train_precision)
-        self.val_precisions.append(val_precision)
-        self.train_recalls.append(train_recall)
-        self.val_recalls.append(val_recall)
-        self.train_f1_scores.append(train_f1)
-        self.val_f1_scores.append(val_f1)
-        self.train_confusion_matrices.append(train_confusion_matrix)
-        self.val_confusion_matrices.append(val_confusion_matrix)
+        self.epoch_nums.append(epoch_num)
+        self.train_metrics.append(train_metric)
+        self.val_metrics.append(val_metric)
 
-        if lr is not None:
-            self.learning_rates.append(lr)
-
-        self.epoch_times.append(epoch_time)
-
-    def save(self, filepath: str):
-        """Save training history to JSON file."""
-        history_dict = {
-            "epochs": self.epochs,
-            "train_losses": self.train_losses,
-            "val_losses": self.val_losses,
-            "learning_rates": self.learning_rates,
-            "epoch_times": self.epoch_times,
-            "train_accuracies": self.train_accuracies,
-            "val_accuracies": self.val_accuracies,
-            "train_precisions": self.train_precisions,
-            "val_precisions": self.val_precisions,
-            "train_recalls": self.train_recalls,
-            "val_recalls": self.val_recalls,
-            "train_f1_scores": self.train_f1_scores,
-            "val_f1_scores": self.val_f1_scores,
-            "train_confusion_matrices": self.train_confusion_matrices,
-            "val_confusion_matrices": self.val_confusion_matrices,
-        }
-
-        with open(filepath, "w") as f:
-            json.dump(history_dict, f, indent=2)
-
-    def load(self, filepath: str):
-        """Load training history from JSON file."""
-        with open(filepath, "r") as f:
-            history_dict = json.load(f)
-        self.epochs = history_dict["epochs"]
-        self.train_losses = history_dict["train_losses"]
-        self.val_losses = history_dict["val_losses"]
-        self.train_accuracies = history_dict["train_accuracies"]
-        self.val_accuracies = history_dict["val_accuracies"]
-        self.learning_rates = history_dict["learning_rates"]
-        self.epoch_times = history_dict["epoch_times"]
-
-        self.train_precisions = history_dict["train_precisions"]
-        self.val_precisions = history_dict["val_precisions"]
-        self.train_recalls = history_dict["train_recalls"]
-        self.val_recalls = history_dict["val_recalls"]
-        self.train_f1_scores = history_dict["train_f1_scores"]
-        self.val_f1_scores = history_dict["val_f1_scores"]
-        # self.train_confusion_matrices = history_dict["train_confusion_matrices"]
-        # self.val_confusion_matrices = history_dict["val_confusion_matrices"]
-
-    def plot_training_curves(self, save_path: Optional[str] = None):
+    def plot_training_curves(self, save_path: str):
         """Plot training curves."""
         fig, axes = plt.subplots(3, 2, figsize=(15, 15))
 
@@ -207,7 +121,7 @@ class TrainingHistory:
 
         plt.close()
 
-    def plot_confusion_matrix(self, save_path: Optional[str] = None):
+    def plot_confusion_matrix(self, save_path: str):
         """Plot confusion matrix."""
         cm = self.val_confusion_matrices[-1]
         sns.heatmap(

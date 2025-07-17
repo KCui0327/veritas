@@ -9,10 +9,10 @@ Date: July 6, 2025
 import random
 from typing import Tuple
 
-import torch
 from torch.utils.data import DataLoader, Subset, random_split
 
 from src.data_models.dataset import VeritasDataset
+from src.util.logger import logger
 
 _DATASET_NAME = "data/veritas_dataset.csv"
 
@@ -25,6 +25,7 @@ def get_dataloaders(
     """
     Get the dataloaders for the training and validation sets.
     """
+    logger.info(f"Building dataset")
     dataset = VeritasDataset(_DATASET_NAME)
 
     # Shuffle the dataset before subsetting
@@ -41,10 +42,9 @@ def get_dataloaders(
 
     train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
 
-    print(f"Dataset info:")
-    print(f"  Total dataset size: {len(dataset)}")
-    print(f"  Train dataset size: {len(train_dataset)}")
-    print(f"  Validation dataset size: {len(val_dataset)}")
+    logger.info(f"Total dataset size: {len(dataset)}")
+    logger.info(f"Train dataset size: {len(train_dataset)}")
+    logger.info(f"Validation dataset size: {len(val_dataset)}")
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
