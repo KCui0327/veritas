@@ -14,13 +14,37 @@ Veritas is a comprehensive fake news detection system that uses multiple machine
 
 The project provides convenient Poetry scripts for common tasks:
 
-| Script           | Command                     | Description                                                            |
-| ---------------- | --------------------------- | ---------------------------------------------------------------------- |
-| `gather-data`    | `poetry run gather-data`    | Process and combine multiple fake news datasets into a unified dataset |
-| `train-rnn`      | `poetry run train-rnn`      | Train the RNN model for fake news detection                            |
-| `train-base`     | `poetry run train-base`     | Train the base model using TF-IDF and Logistic Regression              |
-| `visualize-rnn`  | `poetry run visualize-rnn`  | Generate visualizations of RNN training results                        |
-| `visualize-base` | `poetry run visualize-base` | Generate visualizations of base model performance                      |
+| Script           | Command                     | Arguments | Description                                                            |
+| ---------------- | --------------------------- | --------- | ---------------------------------------------------------------------- |
+| `generate-data`  | `poetry run generate-data`  | None      | Process and combine multiple fake news datasets into a unified dataset |
+| `train-rnn`      | `poetry run train-rnn`      | `--epochs <int>` | Train the RNN model for fake news detection                            |
+| `train-base`     | `poetry run train-base`     | None      | Train the base model using TF-IDF and Logistic Regression              |
+| `visualize-rnn`  | `poetry run visualize-rnn`  | `--history-path <str>` `[--output-path <str>]` | Generate visualizations of RNN training results                        |
+| `visualize-base` | `poetry run visualize-base` | None      | Generate visualizations of base model performance                      |
+
+### Command Line Arguments
+
+#### `train-rnn`
+- `--epochs <int>` (required): Number of epochs to train for
+
+**Example:**
+```bash
+poetry run train-rnn --epochs 50
+```
+
+#### `visualize-rnn`
+- `--history-path <str>` (required): Path to the training history JSON file
+- `--output-path <str>` (optional): Path to save the output visualization. Defaults to "visualizations/training_history.png"
+
+**Example:**
+```bash
+poetry run visualize-rnn --history-path history/training_history/model_128_0.001_0.0.json --output-path visualizations/my_training_results.png
+```
+
+#### Other Scripts
+- `generate-data`: No arguments required
+- `train-base`: No arguments required  
+- `visualize-base`: No arguments required
 
 These scripts are defined in `pyproject.toml` and provide a simple interface to the project's main functionality.
 
