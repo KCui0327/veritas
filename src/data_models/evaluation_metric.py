@@ -24,4 +24,4 @@ class EvaluationMetric:
     dataset_num_true_labels: int = 0
     dataset_num_false_labels: int = 0
 
-    time_taken: int = 0
+    time_taken: float = 0

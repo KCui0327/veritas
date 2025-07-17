@@ -1,3 +1,4 @@
+import argparse
 import json
 import time
 from dataclasses import asdict
@@ -139,6 +140,15 @@ def train_model(model: nn.Module, config: TrainingConfig) -> TrainingHistory:
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--epochs",
+        type=int,
+        required=True,
+        help="Number of epochs to train for",
+    )
+    args = parser.parse_args()
+
     model = FakeNewsDetector(
         vocab_size=20000,
         embed_dim=100,
@@ -156,7 +166,7 @@ def main():
     config = TrainingConfig(
         train_dataloader=train_dataloader,
         val_dataloader=val_dataloader,
-        epochs=1,
+        epochs=args.epochs,
         batch_size=128,
         learning_rate=0.001,
         weight_decay=0.0,
