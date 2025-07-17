@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 import time
 from dataclasses import asdict
 
@@ -134,6 +135,7 @@ def train_model(model: nn.Module, config: TrainingConfig) -> TrainingHistory:
         )
     logger.info(f"Saving model")
     model_name = f"{model.name}_{config.get_config_unique_name()}_model.pth"
+    os.makedirs("history/models", exist_ok=True)
     torch.save(model.state_dict(), f"history/models/{model_name}")
 
     return history
@@ -178,7 +180,7 @@ def main():
     )
 
     history = train_model(model, config)
-
+    os.makedirs("history/training_history", exist_ok=True)
     history_dict = asdict(history)
     with open(
         f"history/training_history/{model.name}_{config.get_config_unique_name()}.json",
