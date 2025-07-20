@@ -163,7 +163,7 @@ def main():
     train_dataloader, val_dataloader = get_dataloaders(
         train_size=0.8,
         batch_size=128,
-        max_records=1000,
+        max_records=100_000,
     )
     config = TrainingConfig(
         train_dataloader=train_dataloader,
@@ -173,10 +173,10 @@ def main():
         learning_rate=0.001,
         weight_decay=0.0,
         optimizer=torch.optim.Adam(model.parameters(), lr=0.001),
-        loss_function=nn.CrossEntropyLoss(),
+        loss_function=nn.BCELoss(),
         use_cuda=torch.cuda.is_available(),
         log_interval=1,
-        eval_interval=1,
+        eval_interval=args.epochs // 10,
     )
 
     history = train_model(model, config)
