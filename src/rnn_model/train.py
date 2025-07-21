@@ -192,6 +192,7 @@ def main():
         weight_decay=0.0,
         optimizer=torch.optim.Adam(model.parameters(), lr=0.001),
         loss_function=nn.BCELoss(),
+        loss_function=nn.BCELoss(),
         use_cuda=torch.cuda.is_available(),
         log_interval=1,
         eval_interval=10,
