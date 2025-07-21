@@ -15,7 +15,8 @@ class TrainingHistory:
         self,
         epoch_num: int,
         train_metric: EvaluationMetric,
-        val_metric: EvaluationMetric,
+        val_metric: EvaluationMetric = None,
     ):
         self.train_metrics[epoch_num] = train_metric
-        self.val_metrics[epoch_num] = val_metric
+        if val_metric is not None:
+            self.val_metrics[epoch_num] = val_metric
