@@ -146,9 +146,14 @@ def train_model(model: nn.Module, config: TrainingConfig) -> TrainingHistory:
             checkpoint_name = (
                 f"{model.name}_{config.get_config_unique_name()}_epoch{epoch+1}.pth"
             )
-            os.makedirs("history/models", exist_ok=True)
-            torch.save(model.state_dict(), f"history/models/{checkpoint_name}")
-            logger.info(f"Saving model to {checkpoint_name}")
+            os.makedirs("checkpoints", exist_ok=True)
+            torch.save(model.state_dict(), f"checkpoints/{checkpoint_name}")
+            logger.info(f"Checkpointing model to {checkpoint_name}")
+
+        model_name = f"{model.name}_{config.get_config_unique_name()}.pth"
+        os.makedirs("history/models", exist_ok=True)
+        torch.save(model.state_dict(), f"history/models/{model_name}")
+        logger.info(f"Saving model to {model_name}")
 
     return history
 
