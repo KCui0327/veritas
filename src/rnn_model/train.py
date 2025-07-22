@@ -148,8 +148,8 @@ def train_model(model: nn.Module, config: TrainingConfig) -> TrainingHistory:
             )
             os.makedirs("history/models", exist_ok=True)
             torch.save(model.state_dict(), f"history/models/{checkpoint_name}")
+            logger.info(f"Saving model to {checkpoint_name}")
 
-    logger.info(f"Saving model")
     return history
 
 
