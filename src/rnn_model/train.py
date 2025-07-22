@@ -22,17 +22,13 @@ def train_model(model: nn.Module, config: TrainingConfig) -> TrainingHistory:
 
     if config.use_cuda:
         logger.info("Using CUDA")
+        logger.info("PyTorch version:", torch.__version__)
+        logger.info("CUDA available:", torch.cuda.is_available())
+        logger.info("CUDA device count:", torch.cuda.device_count())
+        logger.info("Current device:", torch.cuda.current_device())
+        logger.info("Device name:", torch.cuda.get_device_name(0))
+
         model.to(torch.device("cuda"))
-
-    
-
-    print("PyTorch version:", torch.__version__)
-    print("CUDA available:", torch.cuda.is_available())
-    print("CUDA device count:", torch.cuda.device_count())
-    print("Current device:", torch.cuda.current_device())
-    print("Device name:", torch.cuda.get_device_name(0))
-    
-
 
     logger.info(f"Starting training for {config.epochs} epochs...")
     logger.info(f"Training samples: {len(config.train_dataloader.dataset)}")
@@ -40,7 +36,7 @@ def train_model(model: nn.Module, config: TrainingConfig) -> TrainingHistory:
 
     for epoch in range(config.epochs):
         logger.info(f"Epoch {epoch+1}/{config.epochs}")
-    
+
         epoch_start_time = time.time()
         model.train()
         train_metric = EvaluationMetric(
@@ -128,7 +124,6 @@ def train_model(model: nn.Module, config: TrainingConfig) -> TrainingHistory:
             logger.info(f"Training loss: {train_metric.avg_loss}")
             logger.info(f"Training accuracy: {train_metric.accuracy}")
 
-        # Initialize val_metric to None
         val_metric = None
 
         if (epoch + 1) % config.eval_interval == 0:
@@ -147,9 +142,10 @@ def train_model(model: nn.Module, config: TrainingConfig) -> TrainingHistory:
             val_metric=val_metric,
         )
 
-        # Save model every 5 epochs
         if (epoch + 1) % 5 == 0:
-            checkpoint_name = f"{model.name}_{config.get_config_unique_name()}_epoch{epoch+1}.pth"
+            checkpoint_name = (
+                f"{model.name}_{config.get_config_unique_name()}_epoch{epoch+1}.pth"
+            )
             os.makedirs("history/models", exist_ok=True)
             torch.save(model.state_dict(), f"history/models/{checkpoint_name}")
 
@@ -180,7 +176,7 @@ def main():
     train_dataloader, val_dataloader = get_dataloaders(
         train_size=0.8,
         batch_size=128,
-        max_records=100000,
+        max_records=100_000,
     )
 
     config = TrainingConfig(
@@ -192,10 +188,9 @@ def main():
         weight_decay=0.0,
         optimizer=torch.optim.Adam(model.parameters(), lr=0.001),
         loss_function=nn.BCELoss(),
-        loss_function=nn.BCELoss(),
         use_cuda=torch.cuda.is_available(),
         log_interval=1,
-        eval_interval=10,
+        eval_interval=args.epochs // 10,
     )
 
     history = train_model(model, config)
