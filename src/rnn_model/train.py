@@ -22,6 +22,12 @@ def train_model(model: nn.Module, config: TrainingConfig) -> TrainingHistory:
 
     if config.use_cuda:
         logger.info("Using CUDA")
+        logger.info("PyTorch version:", torch.__version__)
+        logger.info("CUDA available:", torch.cuda.is_available())
+        logger.info("CUDA device count:", torch.cuda.device_count())
+        logger.info("Current device:", torch.cuda.current_device())
+        logger.info("Device name:", torch.cuda.get_device_name(0))
+
         model.to(torch.device("cuda"))
 
     logger.info(f"Starting training for {config.epochs} epochs...")
@@ -118,6 +124,8 @@ def train_model(model: nn.Module, config: TrainingConfig) -> TrainingHistory:
             logger.info(f"Training loss: {train_metric.avg_loss}")
             logger.info(f"Training accuracy: {train_metric.accuracy}")
 
+        val_metric = None
+
         if (epoch + 1) % config.eval_interval == 0:
             val_metric = evaluate_model(
                 model,
@@ -133,10 +141,19 @@ def train_model(model: nn.Module, config: TrainingConfig) -> TrainingHistory:
             train_metric=train_metric,
             val_metric=val_metric,
         )
-    logger.info(f"Saving model")
-    model_name = f"{model.name}_{config.get_config_unique_name()}_model.pth"
-    os.makedirs("history/models", exist_ok=True)
-    torch.save(model.state_dict(), f"history/models/{model_name}")
+
+        if (epoch + 1) % 5 == 0:
+            checkpoint_name = (
+                f"{model.name}_{config.get_config_unique_name()}_epoch{epoch+1}.pth"
+            )
+            os.makedirs("checkpoints", exist_ok=True)
+            torch.save(model.state_dict(), f"checkpoints/{checkpoint_name}")
+            logger.info(f"Checkpointing model to {checkpoint_name}")
+
+        model_name = f"{model.name}_{config.get_config_unique_name()}.pth"
+        os.makedirs("history/models", exist_ok=True)
+        torch.save(model.state_dict(), f"history/models/{model_name}")
+        logger.info(f"Saving model to {model_name}")
 
     return history
 
@@ -160,11 +177,13 @@ def main():
         bidirectional=True,
         output_dim=1,
     )
+
     train_dataloader, val_dataloader = get_dataloaders(
         train_size=0.8,
         batch_size=128,
         max_records=100_000,
     )
+
     config = TrainingConfig(
         train_dataloader=train_dataloader,
         val_dataloader=val_dataloader,
