@@ -1,22 +1,17 @@
 import torch
 import torch.nn as nn
-from torchtext.vocab import GloVe
+from sentence_transformers import SentenceTransformer
 
 
-# Model definition
 class FakeNewsDetector(nn.Module):
     def __init__(
         self,
     ):
         super(FakeNewsDetector, self).__init__()
         self.name = "FakeNewsDetector"
-        glove = GloVe(name="6B", dim=300)
-        self.embedding = nn.Embedding.from_pretrained(
-            embeddings=glove.vectors,
-            freeze=True,
-        )
+        # self.embedding = SentenceTransformer("all-MiniLM-L6-v2")
         self.rnn = nn.RNN(
-            input_size=300,
+            input_size=384,
             hidden_size=128,
             num_layers=2,
             bidirectional=True,
@@ -27,9 +22,9 @@ class FakeNewsDetector(nn.Module):
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
-        embedded = self.embedding(x)
+        x = x.unsqueeze(1)
         initial_state = torch.zeros(4, x.size(0), 128)
-        rnn_output, _ = self.rnn(embedded, initial_state)
+        rnn_output, _ = self.rnn(x, initial_state)
         rnn_output = rnn_output[:, -1, :]
         x = self.fc1(rnn_output)
         x = self.fc2(x)

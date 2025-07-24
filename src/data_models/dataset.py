@@ -10,6 +10,7 @@ from collections import Counter
 
 import pandas as pd
 import torch
+from sentence_transformers import SentenceTransformer
 from torch.utils.data import Dataset
 
 
@@ -29,6 +30,8 @@ class VeritasDataset(Dataset):
 
         # Build vocabulary and convert labels
         self._build_vocabulary()
+
+        self.embedding = SentenceTransformer("all-MiniLM-L6-v2")
 
     def _preprocess_text(self, text):
         """Clean and tokenize text."""
@@ -86,7 +89,12 @@ class VeritasDataset(Dataset):
         return len(self.data_frame)
 
     def __getitem__(self, idx):
-        input_tensor = self._text_to_tensor(self.data_frame["statement"][idx])
+        input_tensor = self.embedding.encode(
+            self.data_frame["statement"][idx],
+            convert_to_tensor=True,
+            device="cpu",
+            show_progress_bar=False,
+        )
         label_tensor = torch.tensor(
             0 if self.data_frame["verdict"][idx] else 1, dtype=torch.float
         )
