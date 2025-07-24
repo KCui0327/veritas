@@ -194,7 +194,7 @@ def main():
     os.makedirs("history/training_history", exist_ok=True)
     history_dict = asdict(history)
     with open(
-        f"history/training_history/{model.name}_{config.get_config_unique_name()}.json",
+        f"history/training_history/{model.name}_{model.num_parameters()}_{config.get_config_unique_name()}.json",
         "w",
     ) as f:
         json.dump(history_dict, f)

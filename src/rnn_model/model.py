@@ -34,3 +34,6 @@ class FakeNewsDetector(nn.Module):
         x = self.fc1(rnn_output)
         x = self.fc2(x)
         return self.sigmoid(x).squeeze(1)
+
+    def num_parameters(self):
+        return sum(p.numel() for p in self.parameters())
