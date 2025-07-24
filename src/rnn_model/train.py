@@ -168,20 +168,12 @@ def main():
     )
     args = parser.parse_args()
 
-    model = FakeNewsDetector(
-        vocab_size=20000,
-        embed_dim=100,
-        hidden_dim=128,
-        num_layers=2,
-        dropout_rate=0.5,
-        bidirectional=True,
-        output_dim=1,
-    )
+    model = FakeNewsDetector()
 
     train_dataloader, val_dataloader = get_dataloaders(
         train_size=0.8,
         batch_size=128,
-        max_records=100_000,
+        max_records=1000,
     )
 
     config = TrainingConfig(
