@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 checkpoints/
 history/
+.vector_cache/
 
 # PyCharm specific files
 .idea
