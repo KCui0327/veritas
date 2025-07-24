@@ -158,6 +158,29 @@ def train_model(model: nn.Module, config: TrainingConfig) -> TrainingHistory:
     return history
 
 
+def load_glove_embeddings(glove_file_path):
+    embeddings = {}
+    with open(glove_file_path, "r", encoding="utf-8") as f:
+        for line in f:
+            values = line.strip().split()
+            word = values[0]
+            vector = np.asarray(values[1:], dtype="float32")
+            embeddings[word] = vector
+    return embeddings
+
+
+def build_embedding_matrix(word2idx, glove_embeddings, embed_dim):
+    vocab_size = len(word2idx)
+    embedding_matrix = np.zeros((vocab_size, embed_dim))
+    for word, idx in word2idx.items():
+        vector = glove_embeddings.get(word)
+        if vector is not None:
+            embedding_matrix[idx] = vector
+        else:
+            embedding_matrix[idx] = np.random.normal(scale=0.6, size=(embed_dim,))
+    return embedding_matrix
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -168,9 +191,25 @@ def main():
     )
     args = parser.parse_args()
 
+    # 1. Build dataset and extract vocab
+    dataset_path = "data/veritas_dataset.csv"
+    from src.data_models.dataset import VeritasDataset
+
+    veritas_dataset = VeritasDataset(dataset_path)
+    word2idx = veritas_dataset.word2idx
+    embed_dim = 100
+
+    # 2. Load GloVe and build embedding matrix
+    glove_path = "glove.txt"
+    glove_embeddings = load_glove_embeddings(glove_path)
+    embedding_matrix = build_embedding_matrix(word2idx, glove_embeddings, embed_dim)
+    embedding_matrix = torch.tensor(embedding_matrix, dtype=torch.float)
+    print(embedding_matrix)
+
+    # 3. Instantiate model with pre-trained embeddings
     model = FakeNewsDetector(
-        vocab_size=20000,
-        embed_dim=100,
+        pretrained_embeddings=embedding_matrix,
+        freeze_embeddings=False,
         hidden_dim=128,
         num_layers=2,
         dropout_rate=0.5,
@@ -189,7 +228,7 @@ def main():
         val_dataloader=val_dataloader,
         epochs=args.epochs,
         batch_size=128,
-        learning_rate=0.001,
+        learning_rate=0.01,
         weight_decay=0.0,
         optimizer=torch.optim.Adam(model.parameters(), lr=0.001),
         loss_function=nn.BCELoss(),
@@ -199,6 +238,12 @@ def main():
     )
 
     history = train_model(model, config)
+
+    # Save training history
+    import json
+    import os
+    from dataclasses import asdict
+
     os.makedirs("history/training_history", exist_ok=True)
     history_dict = asdict(history)
     with open(
