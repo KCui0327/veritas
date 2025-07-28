@@ -170,17 +170,18 @@ def main():
 
     model = FakeNewsDetector()
 
+    batch_size = 1
     train_dataloader, val_dataloader = get_dataloaders(
         train_size=0.8,
-        batch_size=128,
-        max_records=1000,
+        batch_size=batch_size,
+        max_records=100_000,
     )
 
     config = TrainingConfig(
         train_dataloader=train_dataloader,
         val_dataloader=val_dataloader,
         epochs=args.epochs,
-        batch_size=128,
+        batch_size=batch_size,
         learning_rate=0.001,
         weight_decay=0.0,
         optimizer=torch.optim.Adam(model.parameters(), lr=0.001),

@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-from sentence_transformers import SentenceTransformer
 
 
 class FakeNewsDetector(nn.Module):
@@ -9,21 +8,19 @@ class FakeNewsDetector(nn.Module):
     ):
         super(FakeNewsDetector, self).__init__()
         self.name = "FakeNewsDetector"
-        # self.embedding = SentenceTransformer("all-MiniLM-L6-v2")
         self.rnn = nn.RNN(
-            input_size=384,
+            input_size=256,
             hidden_size=128,
             num_layers=2,
-            bidirectional=True,
+            bidirectional=False,
             batch_first=True,
         )
-        self.fc1 = nn.Linear(256, 64)
+        self.fc1 = nn.Linear(128, 64)
         self.fc2 = nn.Linear(64, 1)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
-        x = x.unsqueeze(1)
-        initial_state = torch.zeros(4, x.size(0), 128)
+        initial_state = torch.zeros(2, x.size(0), 128)
         rnn_output, _ = self.rnn(x, initial_state)
         rnn_output = rnn_output[:, -1, :]
         x = self.fc1(rnn_output)
