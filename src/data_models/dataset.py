@@ -74,11 +74,12 @@ class VeritasDataset(Dataset):
             else:
                 indices.append(self.word2idx["<UNK>"])
 
-        # Pad or truncate to max_length
-        if len(indices) < self.max_length:
-            indices.extend([self.word2idx["<PAD>"]] * (self.max_length - len(indices)))
-        else:
-            indices = indices[: self.max_length]
+        # commented out code for padding to do padding in collate_fn
+        # # Pad or truncate to max_length
+        # if len(indices) < self.max_length:
+        #     indices.extend([self.word2idx["<PAD>"]] * (self.max_length - len(indices)))
+        # else:
+        #     indices = indices[: self.max_length]
 
         return torch.tensor(indices, dtype=torch.long)
 

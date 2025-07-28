@@ -9,12 +9,38 @@ Date: July 6, 2025
 import random
 from typing import Tuple
 
+import torch
 from torch.utils.data import DataLoader, Subset, random_split
-
 from src.data_models.dataset import VeritasDataset
 from src.util.logger import logger
 
 _DATASET_NAME = "data/veritas_dataset.csv"
+
+
+def collate_fn(batch):
+    """
+    For each batch, pad the statements to the longest length in the batch.
+    """
+    statements = [item[0] for item in batch]
+    labels = [item[1] for item in batch]
+
+    longest_statement_len = max(len(statement) for statement in statements)
+
+    padded = []
+    for statement in statements:
+        if len(statement) < longest_statement_len:
+            padding = longest_statement_len - len(statement)
+            # 0 is <PAD> in our word2idx mapping
+            zeros = torch.zeros(padding, dtype=torch.long)
+            padded_statement = torch.cat((statement, zeros), dim=0)
+        else:
+            padded_statement = statement
+        padded.append(padded_statement)
+
+    ret_statements = torch.stack(padded)
+    ret_labels = torch.stack(labels)
+
+    return ret_statements, ret_labels
 
 
 def get_dataloaders(
@@ -46,7 +72,11 @@ def get_dataloaders(
     logger.info(f"Train dataset size: {len(train_dataset)}")
     logger.info(f"Validation dataset size: {len(val_dataset)}")
 
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
+    train_loader = DataLoader(
+        train_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn
+    )
+    val_loader = DataLoader(
+        val_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn
+    )
 
     return train_loader, val_loader
