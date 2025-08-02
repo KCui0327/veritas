@@ -31,7 +31,7 @@ class FakeNewsDetector(nn.Module):
         initial_state = torch.zeros(4, x.size(0), 300, device=x.device)
         cell_state = torch.zeros(4, x.size(0), 300, device=x.device)
         output, _ = self.rnn(x, (initial_state, cell_state))
-        output = torch.max(output, dim=1)[0]  
+        output = torch.max(output, dim=1)[0]
         x = self.fc1(output)
         x = self.fc2(x)  # passing hidden state here
         return self.sigmoid(x).squeeze(1)
