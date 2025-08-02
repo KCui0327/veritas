@@ -13,7 +13,7 @@ class FakeNewsDetector(nn.Module):
         )  # can also call this at start of main function
         EmbeddingDim = glove.vectors.shape[1]
         self.embedding = nn.Embedding.from_pretrained(glove.vectors)
-        self.rnn = nn.RNN(
+        self.rnn = nn.LSTM(
             input_size=EmbeddingDim,
             hidden_size=300,  # keeping it same as glove dim for simpler vanilla RNN
             num_layers=2,  # usually 2 is enough for this vanilla RNN
@@ -29,7 +29,8 @@ class FakeNewsDetector(nn.Module):
         x = self.embedding(x)  # here the embedding vector is changed
         # For bidirectional RNN with 2 layers means 4 hidden states
         initial_state = torch.zeros(4, x.size(0), 300, device=x.device)
-        output, _ = self.rnn(x, initial_state)
+        cell_state = torch.zeros(4, x.size(0), 300, device=x.device)
+        output, _ = self.rnn(x, (initial_state, cell_state))
         output = output[:, -1, :]  # Take the last output from RNN
         x = self.fc1(output)
         x = self.fc2(x)  # passing hidden state here
