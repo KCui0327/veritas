@@ -202,5 +202,6 @@ def main():
         logger.info(f"Saving history to {history_file_name}")
         json.dump(history_dict, f)
 
+
 if __name__ == "__main__":
     main()
