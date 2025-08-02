@@ -40,7 +40,6 @@ def train_model(model: nn.Module, config: TrainingConfig) -> TrainingHistory:
         epoch_start_time = time.time()
         model.train()
         train_metric = EvaluationMetric(
-            dataset_size=len(config.train_dataloader.dataset),
             batch_size=config.train_dataloader.batch_size,
             num_model_parameters=sum(p.numel() for p in model.parameters()),
         )
