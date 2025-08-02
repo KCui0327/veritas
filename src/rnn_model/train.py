@@ -199,5 +199,6 @@ def main():
     ) as f:
         json.dump(history_dict, f)
 
+
 if __name__ == "__main__":
     main()
