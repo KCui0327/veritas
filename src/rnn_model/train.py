@@ -25,8 +25,8 @@ def train_model(model: nn.Module, config: TrainingConfig) -> TrainingHistory:
         logger.info("PyTorch version:", torch.__version__)
         logger.info("CUDA available:", torch.cuda.is_available())
         logger.info("CUDA device count:", torch.cuda.device_count())
-        logger.info("Current device:", torch.cuda.current_device())
-        logger.info("Device name:", torch.cuda.get_device_name(0))
+        logger.info(f"Current device: {torch.cuda.current_device()}")
+        logger.info(f"Device name: {torch.cuda.get_device_name(0)}")
 
         model.to(torch.device("cuda"))
 
@@ -182,7 +182,7 @@ def main():
         epochs=args.epochs,
         batch_size=128,
         learning_rate=0.001,
-        weight_decay=0.0,
+        weight_decay=0.0001,
         optimizer=torch.optim.Adam(model.parameters(), lr=0.001),
         loss_function=nn.BCELoss(),
         use_cuda=torch.cuda.is_available(),
@@ -198,7 +198,6 @@ def main():
         "w",
     ) as f:
         json.dump(history_dict, f)
-
 
 if __name__ == "__main__":
     main()
