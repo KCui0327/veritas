@@ -1,5 +1,6 @@
 import argparse
 import json
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 
@@ -10,14 +11,23 @@ from src.util.logger import logger
 
 def visualize_training_history(history: TrainingHistory, save_path: str):
     fig, axes = plt.subplots(3, 2, figsize=(15, 15))
+
+    train_epochs = [int(k) for k in history.train_metrics.keys()]
+    val_epochs = [int(k) for k in history.val_metrics.keys()]
+    axes[0, 0].set_xticks(train_epochs[::10])
+    axes[0, 1].set_xticks(train_epochs[::10])
+    axes[1, 0].set_xticks(train_epochs[::10])
+    axes[1, 1].set_xticks(train_epochs[::10])
+    axes[2, 0].set_xticks(train_epochs[::10])
+
     # plot training and validation loss history
     axes[0, 0].plot(
-        history.train_metrics.keys(),
+        train_epochs,
         [metric["avg_loss"] for metric in history.train_metrics.values()],
         label="Training Loss",
     )
     axes[0, 0].plot(
-        history.val_metrics.keys(),
+        val_epochs,
         [metric["avg_loss"] for metric in history.val_metrics.values()],
         label="Validation Loss",
     )
@@ -29,12 +39,12 @@ def visualize_training_history(history: TrainingHistory, save_path: str):
 
     # plot training and validation accuracy history
     axes[0, 1].plot(
-        history.train_metrics.keys(),
+        train_epochs,
         [metric["accuracy"] for metric in history.train_metrics.values()],
         label="Training Accuracy",
     )
     axes[0, 1].plot(
-        history.val_metrics.keys(),
+        val_epochs,
         [metric["accuracy"] for metric in history.val_metrics.values()],
         label="Validation Accuracy",
     )
@@ -43,17 +53,15 @@ def visualize_training_history(history: TrainingHistory, save_path: str):
     axes[0, 1].set_title("Training and Validation Accuracy")
     axes[0, 1].set_xlabel("Epoch")
     axes[0, 1].set_ylabel("Accuracy")
-    plt.savefig(save_path)
-    plt.close()
 
     # plot training and validation precision history
     axes[1, 0].plot(
-        history.train_metrics.keys(),
+        train_epochs,
         [metric["precision"] for metric in history.train_metrics.values()],
         label="Training Precision",
     )
     axes[1, 0].plot(
-        history.val_metrics.keys(),
+        val_epochs,
         [metric["precision"] for metric in history.val_metrics.values()],
         label="Validation Precision",
     )
@@ -67,12 +75,12 @@ def visualize_training_history(history: TrainingHistory, save_path: str):
 
     # plot training and validation recall history
     axes[1, 1].plot(
-        history.train_metrics.keys(),
+        train_epochs,
         [metric["recall"] for metric in history.train_metrics.values()],
         label="Training Recall",
     )
     axes[1, 1].plot(
-        history.val_metrics.keys(),
+        val_epochs,
         [metric["recall"] for metric in history.val_metrics.values()],
         label="Validation Recall",
     )
@@ -84,12 +92,12 @@ def visualize_training_history(history: TrainingHistory, save_path: str):
 
     # plot training and validation f1 score history
     axes[2, 0].plot(
-        history.train_metrics.keys(),
+        train_epochs,
         [metric["f1_score"] for metric in history.train_metrics.values()],
         label="Training F1 Score",
     )
     axes[2, 0].plot(
-        history.val_metrics.keys(),
+        val_epochs,
         [metric["f1_score"] for metric in history.val_metrics.values()],
         label="Validation F1 Score",
     )
@@ -98,6 +106,8 @@ def visualize_training_history(history: TrainingHistory, save_path: str):
     axes[2, 0].set_title("Training and Validation F1 Score")
     axes[2, 0].set_xlabel("Epoch")
     axes[2, 0].set_ylabel("F1 Score")
+
+    axes[2, 1].set_visible(False)
 
     logger.info(f"Saving training history to {save_path}")
     fig.savefig(save_path)
@@ -123,10 +133,12 @@ def main():
     )
     args = parser.parse_args()
 
-    history_path = args.history_path
+    history_path = Path(args.history_path)
     output_path = args.output_path
+
+    history_file_name = history_path.stem
     if not output_path:
-        output_path = "visualizations/training_history.png"
+        output_path = f"visualizations/{history_file_name}_history.png"
 
     with open(history_path, "r") as f:
         history = TrainingHistory(**json.load(f))
