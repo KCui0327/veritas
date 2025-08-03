@@ -10,6 +10,7 @@ from src.util.logger import logger
 from src.data_models.evaluation_metric import EvaluationMetric
 from src.data_models.training_history import TrainingHistory
 
+
 def visualize_training_history(history: TrainingHistory, save_path: str):
     fig, axes = plt.subplots(3, 2, figsize=(15, 15))
 
@@ -112,62 +113,84 @@ def visualize_training_history(history: TrainingHistory, save_path: str):
 
     fig.savefig("visualizations/traininghistory.png")
 
+
 def visualize_evaluation_metric(history: TrainingHistory, save_path: str):
-        fig, ax = plt.subplots()
-        ntp = np.array([metric["num_true_positives"] for metric in history.train_metrics.values()]).mean()
-        nfp = np.array([metric["num_false_positives"] for metric in history.train_metrics.values()]).mean()
-        ntn = np.array([metric["num_true_negatives"] for metric in history.train_metrics.values()]).mean()
-        nfn = np.array([metric["num_false_negatives"] for metric in history.train_metrics.values()]).mean()
-        
-        confussingmatrix = np.array([[ntp, ntn], [nfp, nfn]])
-        class_names = ["Real", "Fake"]
-        titles = ["Actual", "Predicted"]
-        im = ax.imshow(confussingmatrix, cmap="hot", vmin=1000, vmax=50000)
+    fig, ax = plt.subplots()
+    ntp = np.array(
+        [metric["num_true_positives"] for metric in history.train_metrics.values()]
+    ).mean()
+    nfp = np.array(
+        [metric["num_false_positives"] for metric in history.train_metrics.values()]
+    ).mean()
+    ntn = np.array(
+        [metric["num_true_negatives"] for metric in history.train_metrics.values()]
+    ).mean()
+    nfn = np.array(
+        [metric["num_false_negatives"] for metric in history.train_metrics.values()]
+    ).mean()
 
-        ax.set_xticks(np.arange(len(class_names)))
-        ax.set_yticks(np.arange(len(class_names)))
-        ax.set_xticklabels(class_names)
-        ax.set_yticklabels(class_names)
+    confussingmatrix = np.array([[ntp, ntn], [nfp, nfn]])
+    class_names = ["Real", "Fake"]
+    titles = ["Actual", "Predicted"]
+    im = ax.imshow(confussingmatrix, cmap="hot", vmin=1000, vmax=50000)
 
-        plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
-        cbar = plt.colorbar(im, ax=ax)
-        cbar.ax.set_ylabel("Count", rotation=-90, va="bottom")
+    ax.set_xticks(np.arange(len(class_names)))
+    ax.set_yticks(np.arange(len(class_names)))
+    ax.set_xticklabels(class_names)
+    ax.set_yticklabels(class_names)
 
-        for i in range(len(class_names)):
-            for j in range(len(titles)):
-                value = confussingmatrix[i][j]
-                ax.text(j, i, f"{value:.0f}", ha="center", va="center", color="black")
-                
-        ax.set_title("Confusion Matrix")
-        ax.set_xlabel("Predicted")
-        ax.set_ylabel("Actual")
-        plt.tight_layout()
-    
-        fig.savefig("visualizations/confussingmatrix.png")
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+    cbar = plt.colorbar(im, ax=ax)
+    cbar.ax.set_ylabel("Count", rotation=-90, va="bottom")
 
-        f1score = np.array([metric["f1_score"] for metric in history.train_metrics.values()]).mean()
-        accuracy = np.array([metric["accuracy"] for metric in history.train_metrics.values()]).mean()
-        precision = np.array([metric["precision"] for metric in history.train_metrics.values()]).mean()
-        recall = np.array([metric["recall"] for metric in history.train_metrics.values()]).mean()
-        
-        categories = ["F1 Score", "Accuracy", "Precision", "Recall"]
-        values = [f1score, accuracy, precision, recall]
-        colors = ['cyan', 'magenta', 'yellow', 'green']
+    for i in range(len(class_names)):
+        for j in range(len(titles)):
+            value = confussingmatrix[i][j]
+            ax.text(j, i, f"{value:.0f}", ha="center", va="center", color="black")
 
-        fig_bar, ax_bar = plt.subplots()
-        bars = ax_bar.bar(categories, values, color=colors)
-        ax_bar.set_ylim(0, 1)
+    ax.set_title("Confusion Matrix")
+    ax.set_xlabel("Predicted")
+    ax.set_ylabel("Actual")
+    plt.tight_layout()
 
-        for bar in bars:
-            height = bar.get_height()
-            ax_bar.text(bar.get_x() + bar.get_width()/2, height + 0.01, f'{height:.3f}', 
-                    ha='center', va='bottom')
+    fig.savefig("visualizations/confussingmatrix.png")
 
-        ax_bar.set_title("Important Metrics")
-        ax_bar.set_ylabel("Score")
-        plt.xticks(rotation=45)
-        plt.tight_layout()
-        fig_bar.savefig("visualizations/bootyplot.png")
+    f1score = np.array(
+        [metric["f1_score"] for metric in history.train_metrics.values()]
+    ).mean()
+    accuracy = np.array(
+        [metric["accuracy"] for metric in history.train_metrics.values()]
+    ).mean()
+    precision = np.array(
+        [metric["precision"] for metric in history.train_metrics.values()]
+    ).mean()
+    recall = np.array(
+        [metric["recall"] for metric in history.train_metrics.values()]
+    ).mean()
+
+    categories = ["F1 Score", "Accuracy", "Precision", "Recall"]
+    values = [f1score, accuracy, precision, recall]
+    colors = ["cyan", "magenta", "yellow", "green"]
+
+    fig_bar, ax_bar = plt.subplots()
+    bars = ax_bar.bar(categories, values, color=colors)
+    ax_bar.set_ylim(0, 1)
+
+    for bar in bars:
+        height = bar.get_height()
+        ax_bar.text(
+            bar.get_x() + bar.get_width() / 2,
+            height + 0.01,
+            f"{height:.3f}",
+            ha="center",
+            va="bottom",
+        )
+
+    ax_bar.set_title("Important Metrics")
+    ax_bar.set_ylabel("Score")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    fig_bar.savefig("visualizations/bootyplot.png")
 
 
 def main():
@@ -198,6 +221,7 @@ def main():
 
     visualize_training_history(history, save_path=output_path)
     visualize_evaluation_metric(history, save_path=output_path)
+
 
 if __name__ == "__main__":
     main()
