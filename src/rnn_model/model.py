@@ -1,12 +1,10 @@
 import torch
 import torch.nn as nn
 import torchtext
-import torchtext
 from torchtext.vocab import GloVe
 
 
 class FakeNewsDetector(nn.Module):
-    def __init__(self):
     def __init__(self):
         super(FakeNewsDetector, self).__init__()
         self.name = "FakeNewsDetector"
