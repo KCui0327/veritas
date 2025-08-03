@@ -149,7 +149,7 @@ def train_model(model: nn.Module, config: TrainingConfig) -> TrainingHistory:
             torch.save(model.state_dict(), f"checkpoints/{checkpoint_name}")
             logger.info(f"Checkpointing model to {checkpoint_name}")
 
-        model_name = f"{model.name}_{config.get_config_unique_name()}.pth"
+        model_name = f"{model.name}_{epoch}_{config.get_config_unique_name()}.pth"
         os.makedirs("history/models", exist_ok=True)
         torch.save(model.state_dict(), f"history/models/{model_name}")
         logger.info(f"Saving model to {model_name}")
@@ -193,7 +193,7 @@ def main():
     os.makedirs("history/training_history", exist_ok=True)
     history_dict = asdict(history)
     with open(
-        f"history/training_history/{model.name}_{model.num_parameters()}_{config.get_config_unique_name()}.json",
+        f"history/training_history/{model.name}_{int(time.time() * 1000)}_{config.get_config_unique_name()}.json",
         "w",
     ) as f:
         json.dump(history_dict, f)
