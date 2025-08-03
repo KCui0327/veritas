@@ -149,10 +149,10 @@ def train_model(model: nn.Module, config: TrainingConfig) -> TrainingHistory:
             torch.save(model.state_dict(), f"checkpoints/{checkpoint_name}")
             logger.info(f"Checkpointing model to {checkpoint_name}")
 
-        model_name = f"{model.name}_{epoch}_{config.get_config_unique_name()}.pth"
-        os.makedirs("history/models", exist_ok=True)
-        torch.save(model.state_dict(), f"history/models/{model_name}")
-        logger.info(f"Saving model to {model_name}")
+    model_name = f"{model.name}_{config.get_config_unique_name()}.pth"
+    os.makedirs("history/models", exist_ok=True)
+    torch.save(model.state_dict(), f"history/models/{model_name}")
+    logger.info(f"Saving model to {model_name}")
 
     return history
 
@@ -172,7 +172,7 @@ def main():
     train_dataloader, val_dataloader = get_dataloaders(
         train_size=0.8,
         batch_size=128,
-        max_records=100000,
+        max_records=1000,
     )
 
     config = TrainingConfig(
@@ -192,10 +192,14 @@ def main():
     history = train_model(model, config)
     os.makedirs("history/training_history", exist_ok=True)
     history_dict = asdict(history)
+    history_file_name = (
+        f"{model.name}_{int(time.time() * 1000)}_{config.get_config_unique_name()}.json"
+    )
     with open(
-        f"history/training_history/{model.name}_{int(time.time() * 1000)}_{config.get_config_unique_name()}.json",
+        f"history/training_history/{history_file_name}",
         "w",
     ) as f:
+        logger.info(f"Saving history to {history_file_name}")
         json.dump(history_dict, f)
 
 
