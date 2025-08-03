@@ -172,7 +172,7 @@ def main():
     train_dataloader, val_dataloader = get_dataloaders(
         train_size=0.8,
         batch_size=128,
-        max_records=1000,
+        max_records=100_000,
     )
 
     config = TrainingConfig(
