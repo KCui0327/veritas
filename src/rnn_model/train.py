@@ -25,8 +25,8 @@ def train_model(model: nn.Module, config: TrainingConfig) -> TrainingHistory:
         logger.info("PyTorch version:", torch.__version__)
         logger.info("CUDA available:", torch.cuda.is_available())
         logger.info("CUDA device count:", torch.cuda.device_count())
-        logger.info("Current device:", torch.cuda.current_device())
-        logger.info("Device name:", torch.cuda.get_device_name(0))
+        logger.info(f"Current device: {torch.cuda.current_device()}")
+        logger.info(f"Device name: {torch.cuda.get_device_name(0)}")
 
         model.to(torch.device("cuda"))
 
@@ -40,7 +40,6 @@ def train_model(model: nn.Module, config: TrainingConfig) -> TrainingHistory:
         epoch_start_time = time.time()
         model.train()
         train_metric = EvaluationMetric(
-            dataset_size=len(config.train_dataloader.dataset),
             batch_size=config.train_dataloader.batch_size,
             num_model_parameters=sum(p.numel() for p in model.parameters()),
         )
@@ -150,7 +149,7 @@ def train_model(model: nn.Module, config: TrainingConfig) -> TrainingHistory:
             torch.save(model.state_dict(), f"checkpoints/{checkpoint_name}")
             logger.info(f"Checkpointing model to {checkpoint_name}")
 
-        model_name = f"{model.name}_{config.get_config_unique_name()}.pth"
+        model_name = f"{model.name}_{epoch}_{config.get_config_unique_name()}.pth"
         os.makedirs("history/models", exist_ok=True)
         torch.save(model.state_dict(), f"history/models/{model_name}")
         logger.info(f"Saving model to {model_name}")
@@ -173,7 +172,7 @@ def main():
     train_dataloader, val_dataloader = get_dataloaders(
         train_size=0.8,
         batch_size=128,
-        max_records=1000,
+        max_records=100000,
     )
 
     config = TrainingConfig(
@@ -182,7 +181,7 @@ def main():
         epochs=args.epochs,
         batch_size=128,
         learning_rate=0.001,
-        weight_decay=0.0,
+        weight_decay=0.0001,
         optimizer=torch.optim.Adam(model.parameters(), lr=0.001),
         loss_function=nn.BCELoss(),
         use_cuda=torch.cuda.is_available(),
@@ -194,7 +193,7 @@ def main():
     os.makedirs("history/training_history", exist_ok=True)
     history_dict = asdict(history)
     with open(
-        f"history/training_history/{model.name}_{model.num_parameters()}_{config.get_config_unique_name()}.json",
+        f"history/training_history/{model.name}_{int(time.time() * 1000)}_{config.get_config_unique_name()}.json",
         "w",
     ) as f:
         json.dump(history_dict, f)
