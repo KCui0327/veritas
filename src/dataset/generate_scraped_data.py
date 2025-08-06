@@ -19,7 +19,7 @@ def get_real_news():
         df_entry = pd.DataFrame(entries_list, columns=["Title", "Date"])
 
         df = pd.concat([df, df_entry.iloc[:30, :]], ignore_index=True)
-        df.loc[:, "Label"] = "Real"
+        df.loc[:, "Label"] = "True"
 
     df["Date"] = df["Date"].apply(
         lambda date: datetime.strptime(date, "%a, %d %b %Y %H:%M:%S %Z").strftime(
@@ -54,7 +54,7 @@ def empire_news_crawler():
             match = re.search(r"([A-Za-z]+\s+\d{1,2},\s+\d{4})", parts[1])
             date = match.group(1) if match else ""
             df_entry = pd.DataFrame(
-                {"Title": [title], "Date": [date], "Label": ["Fake"]}
+                {"Title": [title], "Date": [date], "Label": ["False"]}
             )
             df = pd.concat([df, df_entry], ignore_index=True)
 
@@ -71,7 +71,7 @@ def now8news_crawler():
         headers = soup.find_all("h3", class_="entry-title content-list-title")
         header_texts = [header.get_text(strip=True) for header in headers]
         for text in header_texts:
-            df_entry = pd.DataFrame({"Title": [text], "Label": ["Fake"]})
+            df_entry = pd.DataFrame({"Title": [text], "Label": ["False"]})
             df = pd.concat([df, df_entry], ignore_index=True)
 
     return df
@@ -89,7 +89,7 @@ def the_onion_crawler():
         )
         header_texts = [header.get_text(strip=True) for header in headers]
         for text in header_texts:
-            df_entry = pd.DataFrame({"Title": [text], "Label": ["Fake"]})
+            df_entry = pd.DataFrame({"Title": [text], "Label": ["False"]})
             df = pd.concat([df, df_entry], ignore_index=True)
 
     return df
