@@ -36,7 +36,6 @@ def main():
         lambda x: hashlib.md5(x.encode("utf-8")).hexdigest()
     )
 
-    
     df.drop_duplicates(subset=["id"], inplace=True, keep="first")
 
     df.to_csv(_OUTPUT_FILE, index=False, encoding="utf-8")
