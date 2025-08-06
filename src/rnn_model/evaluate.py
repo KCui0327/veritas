@@ -11,6 +11,9 @@ from src.dataset.get_data_loaders import get_dataloaders
 from src.util.logger import logger
 
 
+_DATASET_PTH = "data/veritas_dataset.csv"
+
+
 def evaluate_model(
     model: torch.nn.Module,
     dataloader: torch.utils.data.DataLoader,
@@ -119,7 +122,7 @@ if __name__ == "__main__":
     model_path = args.model_path
     model = torch.load(model_path)
     criterion = nn.CrossEntropyLoss()
-    _, validation_loader = get_dataloaders()
+    _, validation_loader = get_dataloaders(_DATASET_PTH)
 
     use_cuda = torch.cuda.is_available()
 

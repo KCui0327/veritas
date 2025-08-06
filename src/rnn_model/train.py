@@ -17,6 +17,9 @@ from src.rnn_model.model import FakeNewsDetector
 from src.util.logger import logger
 
 
+_DATASET_PTH = "data/veritas_dataset.csv"
+
+
 def train_model(model: nn.Module, config: TrainingConfig) -> TrainingHistory:
     history = TrainingHistory()
 
@@ -170,6 +173,7 @@ def main():
     model = FakeNewsDetector()
 
     train_dataloader, val_dataloader = get_dataloaders(
+        _DATASET_PTH,
         train_size=0.8,
         batch_size=128,
         max_records=1000,
