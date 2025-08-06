@@ -1,5 +1,52 @@
 # veritas
-APS360 Project
+
+APS360 Project - Fake News Detection System
+
+## Overview
+
+Veritas is a comprehensive fake news detection system that uses multiple machine learning approaches to classify news articles as real or fake. The project includes:
+
+- **Base Model**: Traditional machine learning approach using TF-IDF and Logistic Regression
+- **RNN Model**: Deep learning approach using Recurrent Neural Networks
+- **Dataset Processing**: Automated pipeline to process multiple fake news datasets
+
+## Poetry Scripts
+
+The project provides convenient Poetry scripts for common tasks:
+
+| Script           | Command                     | Arguments | Description                                                            |
+| ---------------- | --------------------------- | --------- | ---------------------------------------------------------------------- |
+| `generate-data`  | `poetry run generate-data`  | None      | Process and combine multiple fake news datasets into a unified dataset |
+| `train-rnn`      | `poetry run train-rnn`      | `--epochs <int>` | Train the RNN model for fake news detection                            |
+| `train-base`     | `poetry run train-base`     | None      | Train the base model using TF-IDF and Logistic Regression              |
+| `visualize-rnn`  | `poetry run visualize-rnn`  | `--history-path <str>` `[--output-path <str>]` | Generate visualizations of RNN training results                        |
+| `visualize-base` | `poetry run visualize-base` | None      | Generate visualizations of base model performance                      |
+
+### Command Line Arguments
+
+#### `train-rnn`
+- `--epochs <int>` (required): Number of epochs to train for
+
+**Example:**
+```bash
+poetry run train-rnn --epochs 50
+```
+
+#### `visualize-rnn`
+- `--history-path <str>` (required): Path to the training history JSON file
+- `--output-path <str>` (optional): Path to save the output visualization. Defaults to "visualizations/training_history.png"
+
+**Example:**
+```bash
+poetry run visualize-rnn --history-path history/training_history/model_128_0.001_0.0.json --output-path visualizations/my_training_results.png
+```
+
+#### Other Scripts
+- `generate-data`: No arguments required
+- `train-base`: No arguments required  
+- `visualize-base`: No arguments required
+
+These scripts are defined in `pyproject.toml` and provide a simple interface to the project's main functionality.
 
 ## Getting Started
 
@@ -7,55 +54,56 @@ This guide will help you set up the development environment for the veritas proj
 
 ### Prerequisites
 
-- Python 3.8 or higher
-- pip (Python package installer)
+- Python 3.10 or higher
+- Poetry (Python dependency management tool)
 
-### Setting up the Virtual Environment
+### Installing Poetry
+
+If you don't have Poetry installed, follow the official installation guide:
+
+**On macOS/Linux:**
+
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
+```
+
+**On Windows:**
+
+```powershell
+(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
+```
+
+**Verify installation:**
+
+```bash
+poetry --version
+```
+
+### Setting up the Project
 
 1. **Clone the repository** (if you haven't already):
+
    ```bash
    git clone <repository-url>
    cd veritas
    ```
 
-2. **Create a virtual environment**:
+2. **Install dependencies using Poetry:**
+
    ```bash
-   python -m venv venv
+   poetry install
    ```
 
-3. **Activate the virtual environment**:
+3. **Activate the Poetry virtual environment:**
 
-   **On macOS/Linux**:
    ```bash
-   source venv/bin/activate
+   poetry shell
    ```
 
-   **On Windows**:
+4. **Verify the environment is active:**
    ```bash
-   venv\Scripts\activate
-   ```
-
-4. **Verify the virtual environment is active**:
-   ```bash
-   which python  # Should point to your venv directory
-   pip list      # Should show only basic packages
-   ```
-
-### Installing Dependencies
-
-1. **Install required packages** (if you have a requirements.txt file):
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. **Or install packages individually** (if no requirements.txt exists):
-   ```bash
-   pip install <package-name>
-   ```
-
-3. **Verify installation**:
-   ```bash
-   pip list
+   which python  # Should point to Poetry's virtual environment
+   pip list      # Should show all project dependencies
    ```
 
 ### Code Linting with Black
@@ -65,13 +113,14 @@ This project uses [Black](https://black.readthedocs.io/) for automatic code form
 #### Installing Black
 
 1. **Install Black** (if not already installed):
+
    ```bash
-   pip install black
+   poetry add --group dev black
    ```
 
-2. **Verify installation**:
+2. **Verify installation:**
    ```bash
-   black --version
+   poetry run black --version
    ```
 
 #### Using Black with VSCode Extension
@@ -79,12 +128,14 @@ This project uses [Black](https://black.readthedocs.io/) for automatic code form
 The easiest way to use Black is with the VSCode extension:
 
 1. **Install the Black Formatter extension** in VSCode:
+
    - Open VSCode
    - Go to Extensions (Ctrl+Shift+X or Cmd+Shift+X)
    - Search for "Black Formatter"
    - Install the extension by Microsoft
 
 2. **Configure VSCode to use Black**:
+
    - Open VSCode settings (Ctrl+, or Cmd+,)
    - Search for "python formatting provider"
    - Set it to "black"
@@ -101,46 +152,37 @@ If you prefer using Black from the command line:
 
 ```bash
 # Format all Python files in the project
-black .
+poetry run black .
 
 # Format a specific file
-black base_model/base_model.py
+poetry run black src/base_model/main.py
 
 # Check what would be formatted without making changes
-black --check .
+poetry run black --check .
 ```
 
-### Running the Project
-
-1. **Make sure your virtual environment is activated**:
-   ```bash
-   source venv/bin/activate  # macOS/Linux
-   # or
-   venv\Scripts\activate     # Windows
-   ```
-
-2. **Run your project**:
-   ```bash
-   python base_model/base_model.py
-   ```
-
-### Deactivating the Virtual Environment
+### Deactivating the Poetry Environment
 
 When you're done working on the project:
+
 ```bash
-deactivate
+exit  # If using poetry shell
+# or
+deactivate  # If the environment is still active
 ```
 
 ### Troubleshooting
 
 - **If you get permission errors**: Make sure you have write permissions in the project directory
-- **If packages fail to install**: Try upgrading pip first: `pip install --upgrade pip`
-- **If you need to recreate the environment**: Delete the `venv` folder and repeat the setup steps
-- **If Black formatting fails**: Make sure you're in the virtual environment and Black is installed
+- **If Poetry fails to install dependencies**: Try updating Poetry first: `poetry self update`
+- **If you need to recreate the environment**: Delete the `.venv` folder and run `poetry install` again
+- **If Black formatting fails**: Make sure you're in the Poetry environment and Black is installed
+- **If packages are missing**: Run `poetry install` to ensure all dependencies are installed
 
 ### Notes
 
-- Always activate the virtual environment before working on the project
-- The virtual environment keeps project dependencies isolated from your system Python
-- Remember to add `venv/` to your `.gitignore` file if it's not already there
-- Run `black .` before committing to ensure consistent code formatting
+- Always use `poetry run` or activate the Poetry environment before running scripts
+- Poetry automatically manages virtual environments and dependencies
+- The `pyproject.toml` file contains all project dependencies and configuration
+- Run `poetry run black .` before committing to ensure consistent code formatting
+- Poetry creates a `.venv` directory in your project folder for the virtual environment

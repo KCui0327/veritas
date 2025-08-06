@@ -1,0 +1,27 @@
+[tool.poetry.dependencies]
+python = ">=3.12,<4.0"
+pandas = ">=2.0.0"
+scikit-learn = ">=1.0.0"
+matplotlib = ">=3.0.0"
+seaborn = ">=0.10.0"
+requests = "^2.32.4"
+beautifulsoup4 = "^4.13.4"
+pygooglenews = "^0.1.3"
+tweepy = "^4.16.0"
+torchtext = "^0.18.0"
+torch = "2.3.0"
+
+[tool.poetry]
+name = "veritas"
+version = "0.1.0"
+description = "Veritas"
+packages = [
+    { include = "src" }
+]
+
+[tool.poetry.scripts]
+train-rnn = "src.rnn_model.train:main"
+train-base = "src.base_model.train:main"
+generate-data = "src.dataset.generate_veritas_data:main"
+visualize-rnn = "src.rnn_model.visualize:main"
+visualize-base = "src.base_model.visualize:main"
