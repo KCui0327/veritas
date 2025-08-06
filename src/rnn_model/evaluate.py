@@ -1,7 +1,6 @@
 import argparse
 import time
 from typing import Callable
-
 import numpy as np
 import torch
 import torch.nn as nn
