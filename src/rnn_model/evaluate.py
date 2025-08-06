@@ -60,7 +60,7 @@ def evaluate_model(
     all_train_labels = np.array(all_train_labels)
     all_train_preds = np.array(all_train_preds)
 
-    metric.avg_loss = float(metric.total_loss / len(dataloader))
+    metric.avg_loss = float(metric.total_loss / metric.dataset_size)
     metric.inference_time = time.time() - start_time
     metric.dataset_num_true_labels = int(sum(all_train_labels))
     metric.dataset_num_false_labels = int(
