@@ -220,7 +220,7 @@ def main():
     )
     args = parser.parse_args()
 
-    history_path = Path(f"history/training_history/{args.history_path}")
+    history_path = Path(args.history_path)
     output_path = args.output_path
 
     history_file_name = history_path.stem
