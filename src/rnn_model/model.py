@@ -11,13 +11,14 @@ class FakeNewsDetector(nn.Module):
         glove = torchtext.vocab.GloVe(name="6B", dim=300)
         embedding_dim = glove.vectors.shape[1]
         self.embedding = nn.Embedding.from_pretrained(glove.vectors, freeze=True)
-        self.rnn = nn.LSTM(
+        self.rnn = nn.RNN(
             input_size=embedding_dim,
             hidden_size=300,
             num_layers=2,
             bidirectional=True,
             batch_first=True,
         )
+
         self.fc1 = nn.Linear(embedding_dim * 2, 300)
         self.fc2 = nn.Linear(300, 1)
         self.sigmoid = nn.Sigmoid()
@@ -26,8 +27,7 @@ class FakeNewsDetector(nn.Module):
         x = self.embedding(x)
 
         initial_state = torch.zeros(4, x.size(0), 300, device=x.device)
-        cell_state = torch.zeros(4, x.size(0), 300, device=x.device)
-        output, _ = self.rnn(x, (initial_state, cell_state))
+        output, _ = self.rnn(x, initial_state)
         output = torch.max(output, dim=1)[0]
 
         x = self.fc1(output)
