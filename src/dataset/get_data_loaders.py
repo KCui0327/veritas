@@ -12,7 +12,9 @@ from typing import Tuple
 import torch
 from torch.utils.data import DataLoader, Subset, random_split
 from src.data_models.dataset import VeritasDataset
+from src.data_models.dataset_emb import VeritasDatasetEmb
 from src.util.logger import logger
+from torch.nn.utils.rnn import pad_sequence
 
 _DATASET_NAME = "data/veritas_dataset.csv"
 
@@ -43,7 +45,22 @@ def collate_fn(batch):
     return ret_statements, ret_labels
 
 
+def collate_fn_embed(batch):
+    embeddings, labels = zip(*batch)
+
+    padded_embeddings = pad_sequence(
+        embeddings,
+        batch_first=True,
+        padding_value=0.0,
+    )
+
+    labels = torch.stack(labels)
+
+    return padded_embeddings, labels
+
+
 def get_dataloaders(
+    dataset_pth,
     train_size=0.8,
     batch_size=32,
     max_records=10000,
@@ -51,8 +68,19 @@ def get_dataloaders(
     """
     Get the dataloaders for the training and validation sets.
     """
+    if not dataset_pth:
+        dataset_pth = _DATASET_NAME
+
     logger.info(f"Building dataset")
-    dataset = VeritasDataset(_DATASET_NAME)
+
+    if dataset_pth.endswith(".csv"):
+        dataset = VeritasDataset(dataset_pth)
+    elif dataset_pth.endswith(".npz"):
+        dataset = VeritasDatasetEmb(dataset_pth)
+    else:
+        raise ValueError(f"Unsupported dataset format: {dataset_pth}")
+
+    collate_func = collate_fn if not dataset_pth.endswith(".npz") else collate_fn_embed
 
     # Shuffle the dataset before subsetting
     indices = list(range(len(dataset)))
@@ -73,10 +101,10 @@ def get_dataloaders(
     logger.info(f"Validation dataset size: {len(val_dataset)}")
 
     train_loader = DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn
+        train_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_func
     )
     val_loader = DataLoader(
-        val_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn
+        val_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_func
     )
 
     return train_loader, val_loader
