@@ -5,11 +5,11 @@ Author: Kenny Cui
 Date: July 6, 2025
 """
 
-import re
-from collections import Counter
-
 import pandas as pd
 import torch
+import torch.nn as nn
+import torchtext
+from sentence_transformers import SentenceTransformer
 from torch.utils.data import Dataset
 
 
@@ -17,79 +17,58 @@ class VeritasDataset(Dataset):
     def __init__(
         self,
         csv_file: str,
-        vocab_size: int = 20000,
-        max_length: int = 512,
     ):
         self.data_frame = pd.read_csv(csv_file)
+        self.glove = torchtext.vocab.GloVe(name="6B", dim=300)
 
-        self.vocab_size = vocab_size
-        self.max_length = max_length
-        self.word2idx = None
-        self.idx2word = None
+        unk_idx = len(self.glove.stoi)
+        self.glove.stoi["<UNK>"] = unk_idx
+        self.glove.vectors = torch.cat([self.glove.vectors, torch.zeros(1, 300)], dim=0)
 
-        # Build vocabulary and convert labels
-        self._build_vocabulary()
+        pad_idx = len(self.glove.stoi)
+        self.glove.stoi["<PAD>"] = pad_idx
+        self.glove.vectors = torch.cat([self.glove.vectors, torch.zeros(1, 300)], dim=0)
 
-    def _preprocess_text(self, text):
-        """Clean and tokenize text."""
-        if not isinstance(text, str):
-            return []
-
-        text = re.sub(r"[^\w\s]", "", text.lower())
-        tokens = text.split()
-
-        return tokens
-
-    def _build_vocabulary(self):
-        """Build vocabulary from all texts in the dataset."""
-        word_counts = Counter()
-
-        for _, row in self.data_frame.iterrows():
-            tokens = self._preprocess_text(row["statement"])
-            word_counts.update(tokens)
-
-        # Get most common words
-        most_common = word_counts.most_common(
-            self.vocab_size - 2
-        )  # -2 for <PAD> and <UNK>
-
-        # Create word2idx mapping
-        self.word2idx = {"<PAD>": 0, "<UNK>": 1}
-        self.word2idx.update(
-            {word: idx + 2 for idx, (word, _) in enumerate(most_common)}
+        self.embedding = nn.Embedding.from_pretrained(
+            self.glove.vectors,
+            freeze=True,
+            padding_idx=pad_idx,
         )
 
-        # Create idx2word mapping
-        self.idx2word = {idx: word for word, idx in self.word2idx.items()}
+        self.input_tensors = {}
+        self.label_tensors = {}
 
-    def _text_to_tensor(self, text):
-        """Convert text to tensor of token indices."""
-        tokens = self._preprocess_text(text)
+        self.max_length = 0
+        for i, row in self.data_frame.iterrows():
+            statement_length = len(row["statement"].split())
+            self.max_length = max(self.max_length, statement_length)
 
-        # Convert tokens to indices
+        for i, row in self.data_frame.iterrows():
+            statement_embedding = self.preprocess_statement(row["statement"])
+            self.input_tensors[i] = statement_embedding
+            self.label_tensors[i] = torch.tensor(
+                0 if row["verdict"] else 1, dtype=torch.float
+            )
+
+    def preprocess_statement(self, statement: str) -> torch.Tensor:
         indices = []
-        for token in tokens:
-            if token in self.word2idx:
-                indices.append(self.word2idx[token])
+        for word in statement.split():
+            if word not in self.glove.stoi:
+                indices.append(self.glove.stoi["<UNK>"])
             else:
-                indices.append(self.word2idx["<UNK>"])
+                indices.append(self.glove.stoi[word])
 
-        # commented out code for padding to do padding in collate_fn
-        # # Pad or truncate to max_length
-        # if len(indices) < self.max_length:
-        #     indices.extend([self.word2idx["<PAD>"]] * (self.max_length - len(indices)))
-        # else:
-        #     indices = indices[: self.max_length]
+        if len(indices) < self.max_length:
+            indices.extend(
+                [self.glove.stoi["<PAD>"]] * (self.max_length - len(indices))
+            )
 
-        return torch.tensor(indices, dtype=torch.long)
+        indices_tensor = torch.tensor(indices, dtype=torch.long)
+        embedded_sentence = self.embedding(indices_tensor)
+        return embedded_sentence
 
     def __len__(self):
         return len(self.data_frame)
 
     def __getitem__(self, idx):
-        input_tensor = self._text_to_tensor(self.data_frame["statement"][idx])
-        label_tensor = torch.tensor(
-            0 if self.data_frame["verdict"][idx] else 1, dtype=torch.float
-        )
-
-        return input_tensor, label_tensor
+        return self.input_tensors[idx], self.label_tensors[idx]

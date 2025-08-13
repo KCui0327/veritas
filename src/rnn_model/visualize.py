@@ -218,6 +218,12 @@ def main():
         required=False,
         help="Epoch to visualize",
     )
+    parser.add_argument(
+        "--type",
+        type=str,
+        required=True,
+        help="Type of visualization to perform",
+    )
     args = parser.parse_args()
 
     history_path = Path(args.history_path)
@@ -225,13 +231,13 @@ def main():
 
     history_file_name = history_path.stem
     if not output_path:
-        output_path = f"visualizations/{history_file_name}_history.png"
+        output_path = f"visualizations/{history_file_name}.png"
 
     with open(history_path, "r") as f:
         history = TrainingHistory(**json.load(f))
 
     if args.epoch:
-        evaluation_metric = EvaluationMetric(**history.train_metrics[args.epoch])
+        evaluation_metric = EvaluationMetric(**history.val_metrics[args.epoch])
         visualize_evaluation_metric(
             evaluation_metric,
             save_path=f"visualizations/{history_file_name}_epoch_{args.epoch}.png",

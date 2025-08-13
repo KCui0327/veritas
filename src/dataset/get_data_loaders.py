@@ -9,45 +9,25 @@ Date: July 6, 2025
 import random
 from typing import Tuple
 
-import torch
+from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import DataLoader, Subset, random_split
+
 from src.data_models.dataset import VeritasDataset
 from src.util.logger import logger
 
 _DATASET_NAME = "data/veritas_dataset.csv"
+_TEST_DATASET_NAME = "data/veritas_dataset_test.csv"
 
 
 def collate_fn(batch):
-    """
-    For each batch, pad the statements to the longest length in the batch.
-    """
-    statements = [item[0] for item in batch]
-    labels = [item[1] for item in batch]
-
-    longest_statement_len = max(len(statement) for statement in statements)
-
-    padded = []
-    for statement in statements:
-        if len(statement) < longest_statement_len:
-            padding = longest_statement_len - len(statement)
-            # 0 is <PAD> in our word2idx mapping
-            zeros = torch.zeros(padding, dtype=torch.long)
-            padded_statement = torch.cat((statement, zeros), dim=0)
-        else:
-            padded_statement = statement
-        padded.append(padded_statement)
-
-    ret_statements = torch.stack(padded)
-    ret_labels = torch.stack(labels)
-
-    return ret_statements, ret_labels
+    return pad_sequence(batch, batch_first=True, padding_value=0.0)
 
 
 def get_dataloaders(
     train_size=0.8,
     batch_size=32,
-    max_records=10000,
-) -> Tuple[DataLoader, DataLoader]:
+    max_records=100_000,
+) -> Tuple[DataLoader, DataLoader, DataLoader]:
     """
     Get the dataloaders for the training and validation sets.
     """
@@ -72,11 +52,12 @@ def get_dataloaders(
     logger.info(f"Train dataset size: {len(train_dataset)}")
     logger.info(f"Validation dataset size: {len(val_dataset)}")
 
-    train_loader = DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn
-    )
-    val_loader = DataLoader(
-        val_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn
-    )
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
 
     return train_loader, val_loader
+
+
+def get_test_dataloader(batch_size=32) -> DataLoader:
+    test_dataset = VeritasDataset(_TEST_DATASET_NAME)
+    return DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
