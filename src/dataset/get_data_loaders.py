@@ -9,6 +9,7 @@ Date: July 6, 2025
 import random
 from typing import Tuple
 
+import torch
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import DataLoader, Subset, random_split
 
@@ -20,7 +21,11 @@ _TEST_DATASET_NAME = "data/veritas_dataset_test.csv"
 
 
 def collate_fn(batch):
-    return pad_sequence(batch, batch_first=True, padding_value=0.0)
+    inputs = [item[0] for item in batch]
+    labels = [item[1] for item in batch]
+    return pad_sequence(inputs, batch_first=True, padding_value=0.0), torch.stack(
+        labels
+    )
 
 
 def get_dataloaders(
@@ -52,12 +57,18 @@ def get_dataloaders(
     logger.info(f"Train dataset size: {len(train_dataset)}")
     logger.info(f"Validation dataset size: {len(val_dataset)}")
 
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
+    train_loader = DataLoader(
+        train_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn
+    )
+    val_loader = DataLoader(
+        val_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn
+    )
 
     return train_loader, val_loader
 
 
 def get_test_dataloader(batch_size=32) -> DataLoader:
     test_dataset = VeritasDataset(_TEST_DATASET_NAME)
-    return DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
+    return DataLoader(
+        test_dataset, batch_size=batch_size, shuffle=True, collate_fn=collate_fn
+    )
