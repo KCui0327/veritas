@@ -1,5 +1,8 @@
 import argparse
+import json
+import os
 import time
+from dataclasses import asdict
 from typing import Callable
 
 import numpy as np
@@ -7,7 +10,8 @@ import torch
 import torch.nn as nn
 
 from src.data_models.evaluation_metric import EvaluationMetric
-from src.dataset.get_data_loaders import get_dataloaders
+from src.dataset.get_data_loaders import get_test_dataloader
+from src.rnn_model.model import FakeNewsDetector
 from src.util.logger import logger
 
 
@@ -106,7 +110,7 @@ def evaluate_model(
     return metric
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--model-path",
@@ -117,10 +121,22 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     model_path = args.model_path
-    model = torch.load(model_path)
-    criterion = nn.CrossEntropyLoss()
-    _, validation_loader = get_dataloaders()
+    model = FakeNewsDetector()
+    model.load_state_dict(torch.load(model_path, map_location=torch.device("cpu")))
+    criterion = nn.BCELoss()
+    test_loader = get_test_dataloader()
 
     use_cuda = torch.cuda.is_available()
 
-    evaluate_model(model, validation_loader, criterion, use_cuda)
+    evaluation_metric = evaluate_model(model, test_loader, criterion, use_cuda)
+
+    os.makedirs("history/evaluation_history", exist_ok=True)
+    with open(
+        f"history/evaluation_history/{model.name}_{int(time.time() * 1000)}.json", "w"
+    ) as f:
+        logger.info(f"Saving evaluation metric to {f.name}")
+        json.dump(asdict(evaluation_metric), f)
+
+
+if __name__ == "__main__":
+    main()

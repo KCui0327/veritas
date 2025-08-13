@@ -165,6 +165,13 @@ def main():
         required=True,
         help="Number of epochs to train for",
     )
+    parser.add_argument(
+        "--size",
+        type=int,
+        required=False,
+        default=100_000,
+        help="Size of the dataset to train on",
+    )
     args = parser.parse_args()
 
     model = FakeNewsDetector()
@@ -172,7 +179,7 @@ def main():
     train_dataloader, val_dataloader = get_dataloaders(
         train_size=0.8,
         batch_size=128,
-        max_records=1000,
+        max_records=args.size,
     )
 
     config = TrainingConfig(

@@ -26,6 +26,7 @@ packages = [
 [tool.poetry.scripts]
 train-rnn = "src.rnn_model.train:main"
 train-base = "src.base_model.train:main"
+evaluate-rnn = "src.rnn_model.evaluate:main"
 generate-data = "src.dataset.generate_veritas_data:main"
 visualize-rnn = "src.rnn_model.visualize:main"
 visualize-base = "src.base_model.visualize:main"

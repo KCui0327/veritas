@@ -213,6 +213,12 @@ def main():
         help="Path to the output file",
     )
     parser.add_argument(
+        "--type",
+        choices=["history", "evaluation"],
+        required=True,
+        help="Type of visualization to perform",
+    )
+    parser.add_argument(
         "--epoch",
         type=str,
         required=False,
@@ -225,19 +231,24 @@ def main():
 
     history_file_name = history_path.stem
     if not output_path:
-        output_path = f"visualizations/{history_file_name}_history.png"
+        output_path = f"visualizations/{history_file_name}.png"
 
-    with open(history_path, "r") as f:
-        history = TrainingHistory(**json.load(f))
+    if args.type == "history":
 
-    if args.epoch:
-        evaluation_metric = EvaluationMetric(**history.train_metrics[args.epoch])
-        visualize_evaluation_metric(
-            evaluation_metric,
-            save_path=f"visualizations/{history_file_name}_epoch_{args.epoch}.png",
-        )
-    else:
-        visualize_training_history(history, save_path=output_path)
+        with open(history_path, "r") as f:
+            history = TrainingHistory(**json.load(f))
+            visualize_training_history(history, save_path=output_path)
+
+    elif args.type == "evaluation":
+        if args.epoch:
+            with open(history_path, "r") as f:
+                history = TrainingHistory(**json.load(f))
+                evaluation_metric = EvaluationMetric(**history.val_metrics[args.epoch])
+                visualize_evaluation_metric(evaluation_metric, save_path=output_path)
+        else:
+            with open(history_path, "r") as f:
+                evaluation_metric = EvaluationMetric(**json.load(f))
+                visualize_evaluation_metric(evaluation_metric, save_path=output_path)
 
 
 if __name__ == "__main__":
