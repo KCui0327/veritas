@@ -187,13 +187,13 @@ def main():
         val_dataloader=val_dataloader,
         epochs=args.epochs,
         batch_size=128,
-        learning_rate=0.001,
+        learning_rate=0.0001,
         weight_decay=0.0001,
-        optimizer=torch.optim.Adam(model.parameters(), lr=0.001),
+        optimizer=torch.optim.Adam(model.parameters(), lr=0.0001),
         loss_function=nn.BCELoss(),
         use_cuda=torch.cuda.is_available(),
         log_interval=1,
-        eval_interval=args.epochs // 10,
+        eval_interval=1,
     )
 
     history = train_model(model, config)
